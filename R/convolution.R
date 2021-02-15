@@ -1,54 +1,120 @@
-#' Convolution brm Wrappers
+#' Prepare data for fitting using a convolution model
 #'
-#' @description A wrapper for `brms::brm` that implements a custom model where a 
-#' secondary indicator is predicted by a primary indicator over some convolution and 
+#' @param location Character string, variable to use as the spatial location.
+#' @param primary Character string, variable to use as the primary observation.
+#' @param initial_obs Integer, number of observations to hold out from the
+#' likelihood. This is useful as initially the outcome will depend on primary
+#' data outside of the range of the training set and including this could bias
+#' the estimated delay distribution. Defaults to 14 days.
+#' @param max_convolution Integer defining the maximum index to use for the
+#'  convolution. Defaults to 30 days.
+#' @method prepare brmsid_convolution
+#' @export
+#' @author Sam Abbott
+#' @examples
+#' df <- data.frame(
+#'    region = "France", deaths = 1:10, cases = 1:10,
+#'    date = seq(as.Date("2020-10-01"), by = "days", length.out = 10)
+#'    )
+#'
+#' df <- prepare(
+#'   df, model = "convolution", location = "region", primary = "cases"
+#'   )
+#' print(df)
+prepare.brmsid_convolution <- function(data,
+                                       location,
+                                       primary,
+                                       initial_obs = 14,
+                                       max_convolution = 30) {
+  # convert to data.table
+  data <- as.data.table(data)
+
+  # set up location
+  if (!exists("location", data)) {
+    if (missing(location)) {
+      data[, location := "global"]
+    }else{
+      setnames(data, location, "location")
+    }
+  }
+
+  # set up primary observation
+  if (!exists("primary", data)) {
+    if (missing(primary)) {
+      stop("A primary observation type must be defined or otherwise present")
+    }else{
+      setnames(data, primary, "primary")
+    }
+  }
+
+  # order and index data
+  setorder(data, location, date)
+  data[, index := 1:.N, by = location]
+
+  # assign initial observations
+  data[, init_obs := 1:.N, by = location]
+  data[, init_obs := fifelse(init_obs <= initial_obs, 1, 0)]
+
+  # assign start of convolution for each datapoint
+  data[, conv_start := max(1, index - max_convolution)]
+
+  # assign column order
+  setcolorder(data, c("location", "date", "index", "init_obs",
+                      "conv_start", "primary"))
+  return(data)
+}
+
+
+#' Convolution model
+#'
+#' @description A wrapper for `brms::brm` that implements a custom model where a
+#' secondary indicator is predicted by a primary indicator over some convolution and
 #' scaled by a some fraction. The fraction can then be modelled using the regression
-#' framework of `brms`. 
+#' framework of `brms`.
 #' @param formula A model formula
 #' @param data A data.frame that must contain the date, location (as loc), primary
-#' (the data that the outcome is a convolution of) and at least the outcome as 
+#' (the data that the outcome is a convolution of) and at least the outcome as
 #' specifed in `formula`.
-#' @param conv_mean Numeric vector defining the prior for the log mean of the convolution 
+#' @param conv_mean Numeric vector defining the prior for the log mean of the convolution
 #' (mean and standard deviation).
 #' @param conv_sd Numeric vector defining the prior for the standard deviation of the
 #' convolution (mean and standard deviation).
 #' @param conv_max Integer defining the maximum index to use for the convolution.
-#' @param conv_varying A character string defining the variability of the convolution 
-#' distribution. By default this is fixed by other supported options include allowing 
+#' @param conv_varying A character string defining the variability of the convolution
+#' distribution. By default this is fixed by other supported options include allowing
 #' the convolution distribution to vary across location (using a random effect).
-#' @param hold_out_time Integer, number of days to hold out from the likelihood. This 
+#' @param hold_out_time Integer, number of days to hold out from the likelihood. This
 #' is useful as initially the outcome will depend on primary data outside of the range of
-#' the training set. 
+#' the training set.
 #' @param dry_run Logical, defaults to TRUE. For testing purposes should just the `stan`
 #' code be output with not fitting done.
 #' @param ... Additional parameters passed to `brms::brm`.
 #'
 #' @return A ""brmsfit" object.
+#' @method brmid brmsid_convolution
 #' @export
-#' @importFrom data.table as.data.table setorder copy
-#' @importFrom brms brm make_stancode custom_family stanvar
 #' @author Sam Abbott
-brm_convolution <- function(formula, data, conv_mean = c(2.5, 1),
-                            conv_sd = c(1, 0.5), conv_max = 30, 
-                            conv_varying = "fixed", hold_out_time = 28, 
+brmid.brmsid_convolution <- function(formula, data, conv_mean = c(2.5, 1),
+                            conv_sd = c(1, 0.5), conv_max = 30,
+                            conv_varying = "fixed", hold_out_time = 28,
                             dry_run = FALSE, ...) {
-  
+
   conv_varying <- match.arg(conv_varying, choices = c("fixed", "loc"))
-  
+
   # order data
   data <- as.data.table(data)
   data <- setorder(data, loc, date)
   data <- data[, index := 1:.N, by = loc]
-               
+
   # get primary cases
   primary <- data$primary
-               
+
   # filter out held out time
   data <- data[index > hold_out_time]
-  
+
   # define custom stan code
   make_convolution_stan <- function(data, primary, max_conv, conv_varying, ut) {
-    
+
     # custom family
     conv_nb <- function() {
       custom_family(
@@ -59,7 +125,7 @@ brm_convolution <- function(formula, data, conv_mean = c(2.5, 1),
         vars = c("conv_primary[n]")
       )
     }
-     
+
     # get time per location and indexing
     locs_t <- copy(data)[, .(.N), by = loc]$N
     locs <- length(unique(data$loc))
@@ -71,7 +137,7 @@ brm_convolution <- function(formula, data, conv_mean = c(2.5, 1),
       uli <- c(uli, 1 + ult[1:(locs - 1)])
       li <- c(li, 1 + lt[1:(locs - 1)])
     }
-    
+
     conv_nb_lik <- "
 real conv_nb_lpmf(int y, real mu, real phi, real conv_primary) {
     real scaled_primary = mu * conv_primary;
@@ -82,7 +148,7 @@ real conv_nb_rng(int y, real mu, real phi, real conv_primary) {
     return  neg_binomial_2_rng(scaled_primary, phi);
                             }
 "
-    
+
     epinow2_funcs <- "
     // all functions from EpiNow2 (epiforecasts.io/EpiNow2)
 // discretised truncated lognormal pmf
@@ -128,12 +194,12 @@ vector calc_pmf(real conv_mean, real conv_sd, int conv_max) {
       pmf = pmf + discretised_lognormal_pmf(conv_indexes, conv_mean, conv_sd, conv_max);
       return(pmf);
 }"
-  
+
   stan_functions <- c(
     stanvar(block = "functions", scode = conv_nb_lik),
     stanvar(block = "functions", scode = epinow2_funcs)
-  )      
-  
+  )
+
   stan_data <- c(
     stanvar(block = "data",
             scode = "  int locs;",
@@ -168,23 +234,23 @@ vector calc_pmf(real conv_mean, real conv_sd, int conv_max) {
             x =  conv_max,
             name = "conv_max")
   )
-  
+
   if (conv_varying %in% "loc") {
     stan_parameters <- c(
       stanvar(block = "parameters",
-              scode = "  
+              scode = "
   real conv_mean;
   real<lower=0> conv_sd;
   real<lower=0> conv_mean_loc_sd;
   real<lower=0> conv_sd_loc_sd;
   real conv_mean_loc[locs];
   real<lower=0> conv_sd_loc[locs];"))
-    
+
     stan_cmodel <- c(
       stanvar(block = "model",
-              scode = paste0("  
+              scode = paste0("
   vector[N] conv_primary;
-  
+
   conv_mean ~ normal(", conv_mean[1], ",", conv_mean[2], ");
   conv_mean_loc_sd ~ normal(0, 0.1) T[0,];
   conv_mean_loc ~ normal(conv_mean, conv_mean_loc_sd);
@@ -193,7 +259,7 @@ vector calc_pmf(real conv_mean, real conv_sd, int conv_max) {
   for (s in 1:locs) {
     conv_sd_loc[s] ~ normal(conv_sd, conv_mean_loc_sd) T[0,];
   }
-  
+
   for (s in 1:locs) {
     vector[conv_max] pmf = calc_pmf(conv_mean_loc[s], conv_sd_loc[s], conv_max);
     conv_primary[li[s]:lt[s]] = convolve(to_vector(primary[uli[s]:ult[s]]), pmf, ut);
@@ -203,19 +269,19 @@ vector calc_pmf(real conv_mean, real conv_sd, int conv_max) {
   }else{
     stan_parameters <- c(
       stanvar(block = "parameters",
-              scode = "  
+              scode = "
   real conv_mean;
   real<lower=0> conv_sd;"))
-    
+
     stan_cmodel <- c(
       stanvar(block = "model",
-              scode = paste0("  
+              scode = paste0("
   vector[N] conv_primary;
   vector[conv_max] pmf;
-   
+
   conv_mean ~ normal(", conv_mean[1], ",", conv_mean[2], ");
   conv_sd ~ normal(", conv_sd[1], ",", conv_sd[2], ") T[0,];
-  
+
   pmf = calc_pmf(conv_mean, conv_sd, conv_max);
   for (s in 1:locs) {
     conv_primary[li[s]:lt[s]] = convolve(to_vector(primary[uli[s]:ult[s]]), pmf, ut);
@@ -225,19 +291,19 @@ vector calc_pmf(real conv_mean, real conv_sd, int conv_max) {
 
   stanvars <- c(
     stan_functions,
-    stan_data, 
+    stan_data,
     stan_parameters,
     stan_cmodel
   )
-  
+
   if (length(stanvars) == 0) {
     stop("Custom stan code incorrectly defined. This is likely an issue with the input data or parameters")
   }
   return(list(family = conv_nb, other = stanvars))
-}
-  
+  }
+
 conv_stan <- make_convolution_stan(data, primary,
-                                   max_conv = max_conv, 
+                                   max_conv = max_conv,
                                    conv_varying = conv_varying,
                                    ut = hold_out_time)
 
