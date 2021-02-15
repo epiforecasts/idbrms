@@ -4,7 +4,7 @@
 \alias{id_stancode.brmsid_convolution}
 \title{Define stan code for a delay convolution model}
 \usage{
-\method{id_stancode}{brmsid_convolution}(data, conv_type = "lognormal")
+\method{id_stancode}{brmsid_convolution}(data)
 }
 \description{
 Define stan code for a delay convolution model

@@ -55,8 +55,7 @@ dt <- prepare(
   primary = "cases", secondary = "deaths",
   )
   
-  
-brmid(data = dt, dry = TRUE)
+fit <- brmid(data = dt)
 }
 \author{
 Sam Abbott

@@ -8,7 +8,7 @@
   formula = ~1,
   cmean = ~1,
   csd = ~1,
-  family = negbinomial(),
+  family = negbinomial(link = "identity"),
   data,
   priors,
   custom_stancode,
@@ -58,8 +58,7 @@ dt <- prepare(
   primary = "cases", secondary = "deaths",
   )
   
-  
-brmid(data = dt, dry = TRUE)
+fit <- brmid(data = dt)
 }
 \author{
 Sam Abbott

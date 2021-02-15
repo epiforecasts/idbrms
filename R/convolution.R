@@ -71,24 +71,55 @@ prepare.brmsid_convolution <- function(data, location, primary, secondary,
   data[, init_obs := 1:.N, by = location]
   data[, init_obs := fifelse(init_obs <= initial_obs, 1, 0)]
 
-  # assign start of convolution for each datapoint
+  # assign start of convolution for each data point
   data[, cstart := index - max_convolution]
   data[cstart < 1, cstart := 1]
   
   # assign max convolution variable
-  data[, cmax := index - cstart + 1]
+  data[, cmax := as.integer(index - cstart + 1)]
+  
+  # enforce integers
+  dcols <- colnames(data)
+  sdcols <- c("index", "cstart", "cmax", "init_obs", "primary", "secondary")
+  data <- data[,lapply(.SD, as.integer), .SDcols = sdcols, 
+                by = setdiff(dcols, sdcols)]
   
   # assign column order
+  setorder(data, location, date)
   setcolorder(data, c("location", "date", "time", "index", "init_obs",
                       "cstart", "cmax", "primary", "secondary"))
   return(data)
 }
 
 #' Define priors for the delay convolution model
+#' @param scale Vector of length two defining the mean and the standard
+#' deviation of the normal prior for the scaling factor.
+#' @param cmean Vector of length two defining the mean and standard deviation of
+#' the log mean of the delay distribution.
+#' @param lcsd Vector of length two defining the mean and standard deviation of
+#' the log standard deviation logged.
+#' the standard deviation to be greater than 0 on the unconstrained scale.
 #' @method id_priors brmsid_convolution
 #' @export
-id_priors.brmsid_convolution <- function(data, conv_type = "lognormal") {
-
+#' @examples
+#' x <- 1
+#' class(x) <- "brmsid_convolution"
+#' id_priors(x)
+id_priors.brmsid_convolution <- function(data, 
+                                         scale = c(round(log(0.1), 2), 0.05), 
+                                         cmean = c(2.5, 1), 
+                                         lcsd = c(-0.5, 0.25)) {
+  
+  priors <- set_prior(paste0("normal(", scale[1], ",", scale[2], ")"), 
+                      nlpar = "scale", coef = "Intercept") +
+    set_prior(paste0("normal(", cmean[1], ",", cmean[2], ")"), 
+              nlpar = "cmean", coef = "Intercept") +
+    set_prior(paste0("normal(", lcsd[1], ",", lcsd[2], ")"), 
+              nlpar = "lcsd", coef = "Intercept") +
+    prior(normal(0, 0.1), nlpar = "scale") +
+    prior(normal(0, 1), nlpar = "cmean") +
+    prior(normal(0, 0.1), nlpar = "lcsd")
+  return(priors)
 }
 
 #' Define stan code for a delay convolution model
@@ -99,7 +130,7 @@ id_priors.brmsid_convolution <- function(data, conv_type = "lognormal") {
 #' x <- 1
 #' class(x) <- "brmsid_convolution"
 #' custom_stan <- id_stancode(x)
-id_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
+id_stancode.brmsid_convolution <- function(data) {
   stanvars <- c(
     stanvar(block = "functions",
             scode = "
@@ -134,17 +165,20 @@ id_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
     }"),
     stanvar(block = "functions", 
             scode = "
-   vector convolve(int secondary, vector primary, real scale,
-                   real cmean, real csd, int cmax,
-                   int index, int conv_start, int init) {
-    real cs;
-    if (init) {
-      cs = to_real(secondary);
-    }else{
-      vector[cmax] pmf = calc_pmf(cmean, csd, cmax);       
+   vector convolve(int[] primary, vector scale,
+                   vector cmean, vector  lcsd, int[] cmax,
+                   int[] index, int[] cstart, int[] init) {
+    int n = num_elements(scale);
+    vector[n] p = to_vector(primary);
+    vector[n] ils = inv_logit(scale);
+    vector[n] csd = exp(lcsd);
+    vector[n] cs;
+    
+    for (i in 1:n) {
+      vector[cmax[i]] pmf = calc_pmf(cmean[i], csd[i], cmax[i]);       
       real cp = 1e-5;
-      cp += dot_product(primary[cstart:index], tail(pmf, cmax));
-      cs = scale * cp; 
+      cp += dot_product(p[cstart[i]:index[i]], tail(pmf, cmax[i]));
+      cs[i] = cp * ils[i]; 
     }
     return(cs);
   }"))
@@ -186,10 +220,9 @@ id_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
 #'   primary = "cases", secondary = "deaths",
 #'   )
 #'   
-#'   
-#' brmid(data = dt, dry = TRUE)
+#' fit <- brmid(data = dt)
 brmid.brmsid_convolution <- function(formula = ~ 1, cmean = ~ 1,
-                                     csd = ~ 1, family = negbinomial(), 
+                                     csd = ~ 1, family = negbinomial(link = "identity"), 
                                      data, priors, custom_stancode, 
                                      use_default_formula = TRUE, dry = FALSE, 
                                      ...) {
@@ -203,12 +236,12 @@ brmid.brmsid_convolution <- function(formula = ~ 1, cmean = ~ 1,
   
   if (use_default_formula) {
     form <- bf(
-      secondary ~ convolve(secondary, primary, scale, cmean, csd, 
+      secondary ~ convolve(primary, scale, cmean, lcsd, 
                            cmax, index, cstart, init_obs),
       as.formula(paste0("scale ", paste(formula, collapse = " "))), 
       as.formula(paste0("cmean", paste(cmean, collapse = " "))),
-      as.formula(paste0("csd",paste(csd, collapse = " "))),
-      nl = TRUE
+      as.formula(paste0("lcsd",paste(csd, collapse = " "))),
+      nl = TRUE, loop = FALSE
     )
   }else{
     form <- formula

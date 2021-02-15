@@ -9,6 +9,11 @@ id_priors(data, ...)
 \description{
 Define model specific priors
 }
+\examples{
+x <- 1
+class(x) <- "brmsid_convolution"
+id_priors(x)
+}
 \author{
 Sam Abbott
 }

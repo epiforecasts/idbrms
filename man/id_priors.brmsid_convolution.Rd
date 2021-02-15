@@ -4,8 +4,29 @@
 \alias{id_priors.brmsid_convolution}
 \title{Define priors for the delay convolution model}
 \usage{
-\method{id_priors}{brmsid_convolution}(data, conv_type = "lognormal")
+\method{id_priors}{brmsid_convolution}(
+  data,
+  scale = c(round(log(0.1), 2), 0.05),
+  cmean = c(2.5, 1),
+  lcsd = c(-0.5, 0.25)
+)
+}
+\arguments{
+\item{scale}{Vector of length two defining the mean and the standard
+deviation of the normal prior for the scaling factor.}
+
+\item{cmean}{Vector of length two defining the mean and standard deviation of
+the log mean of the delay distribution.}
+
+\item{lcsd}{Vector of length two defining the mean and standard deviation of
+the log standard deviation logged.
+the standard deviation to be greater than 0 on the unconstrained scale.}
 }
 \description{
 Define priors for the delay convolution model
+}
+\examples{
+x <- 1
+class(x) <- "brmsid_convolution"
+id_priors(x)
 }
