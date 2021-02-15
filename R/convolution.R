@@ -16,16 +16,20 @@
 #' @export
 #' @author Sam Abbott
 #' @examples
-#' df <- data.frame(
-#'    region = "France", deaths = 1:10, cases = 1:10,
-#'    date = seq(as.Date("2020-10-01"), by = "days", length.out = 10)
+#' # define some example data
+#' library(data.table)
+#' dt <- data.table(
+#'    region = "France", cases = seq(10, 500, by = 10),
+#'    date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
 #'    )
-#'
-#' df <- prepare(
-#'   df, model = "convolution", location = "region", 
+#' dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+#' dt[is.na(deaths), deaths := 0]
+#' 
+#' dt <- prepare(
+#'   dt, model = "convolution", location = "region", 
 #'   primary = "cases", secondary = "deaths",
 #'   )
-#' print(df)
+#' dt[]
 prepare.brmsid_convolution <- function(data, location, primary, secondary, 
                                        initial_obs = 14, max_convolution = 30) {
   # convert to data.table
@@ -68,7 +72,8 @@ prepare.brmsid_convolution <- function(data, location, primary, secondary,
   data[, init_obs := fifelse(init_obs <= initial_obs, 1, 0)]
 
   # assign start of convolution for each datapoint
-  data[, conv_start := max(1, index - max_convolution)]
+  data[, conv_start := index - max_convolution]
+  data[conv_start < 1, conv_start := 1]
   
   # assign max convolution variable
   data[, conv_max := index - conv_start + 1]
@@ -79,15 +84,22 @@ prepare.brmsid_convolution <- function(data, location, primary, secondary,
   return(data)
 }
 
-#' @method define_priors brmsid_convolution
+#' Define priors for the delay convolution model
+#' @method id_priors brmsid_convolution
 #' @export
-define_priors.brmsid_convolution <- function(data, conv_type = "lognormal") {
+id_priors.brmsid_convolution <- function(data, conv_type = "lognormal") {
   
 }
 
-#' @method custom_stancode brmsid_convolution
+#' Define stan code for a delay convolution model
+#' 
+#' @method id_stancode brmsid_convolution
 #' @export
-custom_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
+#' @examples 
+#' x <- 1
+#' class(x) <- "brmsid_convolution"
+#' custom_stan <- id_stancode(x)
+id_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
   stanvars <- c(
     stanvar(block = "functions",
             scode = "
@@ -135,8 +147,7 @@ custom_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
       cs = scale * cp; 
     }
     return(cs);
-  }"),
-  )
+  }"))
 }
 
 #' Delay Convolution Model
@@ -162,15 +173,15 @@ custom_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
 #' @author Sam Abbott
 brmid.brmsid_convolution <- function(formula = ~ 1, conv_mean = ~ 1,
                                      conv_sd = ~ 1, family = negbinomial(), 
-                                     data, priors, custom_stan, 
+                                     data, priors, id_stancode, 
                                      use_default_formula = TRUE, dry = FALSE, 
                                      ...) {
   if (missing(priors)) {
-    priors <- define_priors(data)
+    priors <- id_priors(data)
   }
   
-  if (missing(custom_stan)) {
-    custom_stan <- custom_stancode(data)
+  if (missing(id_stancode)) {
+    id_stancode <- id_stancode(data)
   }
   
   if (use_default_formula) {
@@ -190,8 +201,9 @@ brm_fn <- ifelse(dry, make_stancode, brm)
 fit <- brm_fn(formula = form,
               family = family,
               data = data,
+              data2 = list(primary = data$primary),
               prior = priors,
-              stanvars = custom_stan,
+              stanvars = id_stancode,
               ...)
 return(fit)
 }

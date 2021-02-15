@@ -4,12 +4,25 @@
 \alias{prepare.brmsid_convolution}
 \title{Prepare data for fitting using a convolution model}
 \usage{
-\method{prepare}{brmsid_convolution}(data, location, primary, initial_obs = 14, max_convolution = 30)
+\method{prepare}{brmsid_convolution}(
+  data,
+  location,
+  primary,
+  secondary,
+  initial_obs = 14,
+  max_convolution = 30
+)
 }
 \arguments{
+\item{data}{A data frame containing at least two integer observations and a date
+variable.}
+
 \item{location}{Character string, variable to use as the spatial location.}
 
 \item{primary}{Character string, variable to use as the primary observation.}
+
+\item{secondary}{Character string, variable to use as the secondary
+observation.}
 
 \item{initial_obs}{Integer, number of observations to hold out from the
 likelihood. This is useful as initially the outcome will depend on primary
@@ -23,15 +36,20 @@ convolution. Defaults to 30 days.}
 Prepare data for fitting using a convolution model
 }
 \examples{
-df <- data.frame(
-   region = "France", deaths = 1:10, cases = 1:10,
-   date = seq(as.Date("2020-10-01"), by = "days", length.out = 10)
+# define some example data
+library(data.table)
+dt <- data.table(
+   region = "France", cases = seq(10, 500, by = 10),
+   date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
    )
+dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+dt[is.na(deaths), deaths := 0]
 
-df <- prepare(
-  df, model = "convolution", location = "region", primary = "cases"
+dt <- prepare(
+  dt, model = "convolution", location = "region", 
+  primary = "cases", secondary = "deaths",
   )
-print(df)
+dt[]
 }
 \author{
 Sam Abbott

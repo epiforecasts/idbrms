@@ -4,12 +4,38 @@
 \alias{brmid}
 \title{Infectious disease modelling wrapper for brm}
 \usage{
-brmid(formula, data, ...)
+brmid(
+  formula,
+  data,
+  family,
+  priors,
+  custom_stan,
+  dry = FALSE,
+  use_default_formula = TRUE,
+  ...
+)
 }
 \arguments{
 \item{formula}{Formula of the main regression equation for the \code{brmid} model.}
 
 \item{data}{A data frame as prepared for modelling using \code{prepare}.}
+
+\item{family}{A observation model family as defined in \code{brms}.}
+
+\item{priors}{A list of priors as defined using \code{brms} or \code{id_priors}.
+Defaults to the the \code{id_priors} defined for the model class being fit.}
+
+\item{dry}{Logical, defaults to TRUE. For testing purposes should just the \code{stan}
+code be output with not fitting done.}
+
+\item{use_default_formula}{Logical, defaults to \code{TRUE}. Should the default
+formula for the model class being fit be used or should the user defined
+formulate override it (useful when specifying alternative non-linear
+frameworks to the default).}
+
+\item{id_stancode}{A list of \code{stanvars} used to define custom stancode in
+\code{brms}. By default uses the code designed for the model class being fit (as
+specified using \code{id_stancode}).}
 }
 \description{
 Infectious disease modelling wrapper for brm

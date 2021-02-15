@@ -10,9 +10,11 @@ prepare(data, ...)
 \method{prepare}{default}(data, model, ...)
 }
 \arguments{
+\item{data}{A dataframe to be used for modelling}
+
 \item{...}{Additional arguments passed to model specific prepare functions}
 
-\item{model}{Character string, model type to prepare to use. Support options
+\item{model}{Character string, model type to prepare to use. Supported options
 are "convolution".}
 }
 \description{
@@ -21,15 +23,20 @@ Prepare data for modelling with brmid
 Default method used when preparing data
 }
 \examples{
-df <- data.frame(
-   region = "France", deaths = 1:10, cases = 1:10,
-   date = seq(as.Date("2020-10-01"), by = "days", length.out = 10)
+# define some example data
+library(data.table)
+dt <- data.table(
+   region = "France", cases = seq(10, 500, by = 10),
+   date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
    )
+dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+dt[is.na(deaths), deaths := 0]
 
-df <- prepare(
-  df, model = "convolution", location = "region", primary = "cases"
+dt <- prepare(
+  dt, model = "convolution", location = "region", 
+  primary = "cases", secondary = "deaths",
   )
-print(df)
+dt[]
 }
 \author{
 Sam Abbott

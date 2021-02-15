@@ -2,56 +2,46 @@
 % Please edit documentation in R/convolution.R
 \name{brmid.brmsid_convolution}
 \alias{brmid.brmsid_convolution}
-\title{Convolution model}
+\title{Delay Convolution Model}
 \usage{
 \method{brmid}{brmsid_convolution}(
-  formula,
+  formula = ~1,
+  conv_mean = ~1,
+  conv_sd = ~1,
+  family = negbinomial(),
   data,
-  conv_mean = c(2.5, 1),
-  conv_sd = c(1, 0.5),
-  conv_max = 30,
-  conv_varying = "fixed",
-  hold_out_time = 28,
-  dry_run = FALSE,
+  priors,
+  id_stancode,
+  use_default_formula = TRUE,
+  dry = FALSE,
   ...
 )
 }
 \arguments{
 \item{formula}{A model formula}
 
-\item{data}{A data.frame that must contain the date, location (as loc), primary
-(the data that the outcome is a convolution of) and at least the outcome as
-specifed in \code{formula}.}
+\item{conv_mean}{Formula for the convolution mean. Defaults to intercept
+only.}
 
-\item{conv_mean}{Numeric vector defining the prior for the log mean of the convolution
-(mean and standard deviation).}
+\item{conv_sd}{Formula for the convolution standard deviation. Defaults to
+intercept only.}
 
-\item{conv_sd}{Numeric vector defining the prior for the standard deviation of the
-convolution (mean and standard deviation).}
-
-\item{conv_max}{Integer defining the maximum index to use for the convolution.}
-
-\item{conv_varying}{A character string defining the variability of the convolution
-distribution. By default this is fixed by other supported options include allowing
-the convolution distribution to vary across location (using a random effect).}
-
-\item{hold_out_time}{Integer, number of days to hold out from the likelihood. This
-is useful as initially the outcome will depend on primary data outside of the range of
-the training set.}
-
-\item{dry_run}{Logical, defaults to TRUE. For testing purposes should just the \code{stan}
-code be output with not fitting done.}
+\item{data}{A data.frame as produced by \code{prepare} that must contain the date,
+location (as loc), primary (the data that the outcome is a convolution of)
+and at least the outcome as specifed in \code{formula}.}
 
 \item{...}{Additional parameters passed to \code{brms::brm}.}
 }
 \value{
-A ""brmsfit" object.
+A "brmsfit" object or stan code (if \code{dry = TRUE}).
 }
 \description{
-A wrapper for \code{brms::brm} that implements a custom model where a
-secondary indicator is predicted by a primary indicator over some convolution and
-scaled by a some fraction. The fraction can then be modelled using the regression
-framework of \code{brms}.
+A model that assumes that a secondary observations can be
+predicted using a convolution of a primary observation multipled by some
+scaling factor. An example use case of this model is to estimate the
+case fatality rate (with the primary observation being cases and the
+secondary observation being deaths) and then explore factors that influence
+it.
 }
 \author{
 Sam Abbott

@@ -10,7 +10,7 @@ prepare <- function(data, ...) {
 
 #' Default method used when preparing data
 #'
-#' @param model Character string, model type to prepare to use. Support options
+#' @param model Character string, model type to prepare to use. Supported options
 #' are "convolution".
 #' @param ... Additional arguments passed to model specific prepare functions
 #' @rdname prepare
@@ -31,10 +31,11 @@ prepare.default <- function(data, model, ...) {
 #' @param dry Logical, defaults to TRUE. For testing purposes should just the `stan`
 #' code be output with not fitting done.
 #' @param family A observation model family as defined in `brms`.
-#' @param priors A list of priors as defined using `brms` or `brmid_priors`. 
-#' Defaults to the the `default_priors` defined for the model class being fit.
-#' @param custom_stan A list of `stanvars` used to define custom stancode in 
-#' `brms`. By default uses the code designed for the model class being fit.
+#' @param priors A list of priors as defined using `brms` or `id_priors`. 
+#' Defaults to the the `id_priors` defined for the model class being fit.
+#' @param id_stancode A list of `stanvars` used to define custom stancode in 
+#' `brms`. By default uses the code designed for the model class being fit (as
+#' specified using `id_stancode`).
 #' @param use_default_formula Logical, defaults to `TRUE`. Should the default 
 #' formula for the model class being fit be used or should the user defined 
 #' formulate override it (useful when specifying alternative non-linear 
@@ -43,6 +44,7 @@ prepare.default <- function(data, model, ...) {
 #' @export
 #' @author Sam Abbott
 #' @import brms
+#' @inherit brmid.brmsid_convolution examples
 brmid <- function(formula, data, family, priors, custom_stan,
                   dry = FALSE, use_default_formula = TRUE, ...) {
   UseMethod("brmid")
@@ -50,14 +52,18 @@ brmid <- function(formula, data, family, priors, custom_stan,
 
 #' Define model specific priors
 #' @export
+#' @rdname id_priors
 #' @author Sam Abbott
-define_priors <- function(data, ...) {
-  UseMethod("define_priors")
+#' @inherit id_priors.brmsid_convolution examples
+id_priors <- function(data, ...) {
+  UseMethod("id_priors")
 }
 
 #' Define model specific stancode
 #' @export
+#' @rdname id_stancode
 #' @author Sam Abbott
-custom_stancode <- function(data, ...) {
-  UseMethod("custom_stancode")
+#' @inherit id_stancode.brmsid_convolution examples
+id_stancode <- function(data, ...) {
+  UseMethod("id_stancode")
 }
