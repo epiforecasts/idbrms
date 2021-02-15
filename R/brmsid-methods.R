@@ -1,4 +1,6 @@
 #' Prepare data for modelling with brmid
+#' 
+#' @param data A dataframe to be used for modelling
 #' @rdname prepare
 #' @export
 #' @author Sam Abbott
@@ -44,4 +46,18 @@ prepare.default <- function(data, model, ...) {
 brmid <- function(formula, data, family, priors, custom_stan,
                   dry = FALSE, use_default_formula = TRUE, ...) {
   UseMethod("brmid")
+}
+
+#' Define model specific priors
+#' @export
+#' @author Sam Abbott
+define_priors <- function(data, ...) {
+  UseMethod("define_priors")
+}
+
+#' Define model specific stancode
+#' @export
+#' @author Sam Abbott
+custom_stancode <- function(data, ...) {
+  UseMethod("custom_stancode")
 }
