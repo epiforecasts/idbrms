@@ -6,12 +6,12 @@
 \usage{
 \method{brmid}{brmsid_convolution}(
   formula = ~1,
-  conv_mean = ~1,
-  conv_sd = ~1,
+  cmean = ~1,
+  csd = ~1,
   family = negbinomial(),
   data,
   priors,
-  id_stancode,
+  custom_stancode,
   use_default_formula = TRUE,
   dry = FALSE,
   ...
@@ -20,10 +20,10 @@
 \arguments{
 \item{formula}{A model formula}
 
-\item{conv_mean}{Formula for the convolution mean. Defaults to intercept
+\item{cmean}{Formula for the convolution mean. Defaults to intercept
 only.}
 
-\item{conv_sd}{Formula for the convolution standard deviation. Defaults to
+\item{csd}{Formula for the convolution standard deviation. Defaults to
 intercept only.}
 
 \item{data}{A data.frame as produced by \code{prepare} that must contain the date,
@@ -42,6 +42,24 @@ scaling factor. An example use case of this model is to estimate the
 case fatality rate (with the primary observation being cases and the
 secondary observation being deaths) and then explore factors that influence
 it.
+}
+\examples{
+# define some example data
+library(data.table)
+dt <- data.table(
+   region = "France", cases = seq(10, 500, by = 10),
+   date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
+   )
+dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+dt[is.na(deaths), deaths := 0]
+
+dt <- prepare(
+  dt, model = "convolution", location = "region", 
+  primary = "cases", secondary = "deaths",
+  )
+  
+  
+brmid(data = dt, dry = TRUE)
 }
 \author{
 Sam Abbott

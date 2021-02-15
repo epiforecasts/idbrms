@@ -33,7 +33,7 @@ prepare.default <- function(data, model, ...) {
 #' @param family A observation model family as defined in `brms`.
 #' @param priors A list of priors as defined using `brms` or `id_priors`. 
 #' Defaults to the the `id_priors` defined for the model class being fit.
-#' @param id_stancode A list of `stanvars` used to define custom stancode in 
+#' @param custom_stancode A list of `stanvars` used to define custom stancode in 
 #' `brms`. By default uses the code designed for the model class being fit (as
 #' specified using `id_stancode`).
 #' @param use_default_formula Logical, defaults to `TRUE`. Should the default 

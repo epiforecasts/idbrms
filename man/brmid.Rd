@@ -33,12 +33,30 @@ formula for the model class being fit be used or should the user defined
 formulate override it (useful when specifying alternative non-linear
 frameworks to the default).}
 
-\item{id_stancode}{A list of \code{stanvars} used to define custom stancode in
+\item{custom_stancode}{A list of \code{stanvars} used to define custom stancode in
 \code{brms}. By default uses the code designed for the model class being fit (as
 specified using \code{id_stancode}).}
 }
 \description{
 Infectious disease modelling wrapper for brm
+}
+\examples{
+# define some example data
+library(data.table)
+dt <- data.table(
+   region = "France", cases = seq(10, 500, by = 10),
+   date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
+   )
+dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+dt[is.na(deaths), deaths := 0]
+
+dt <- prepare(
+  dt, model = "convolution", location = "region", 
+  primary = "cases", secondary = "deaths",
+  )
+  
+  
+brmid(data = dt, dry = TRUE)
 }
 \author{
 Sam Abbott

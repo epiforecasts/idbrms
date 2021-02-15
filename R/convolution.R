@@ -72,15 +72,15 @@ prepare.brmsid_convolution <- function(data, location, primary, secondary,
   data[, init_obs := fifelse(init_obs <= initial_obs, 1, 0)]
 
   # assign start of convolution for each datapoint
-  data[, conv_start := index - max_convolution]
-  data[conv_start < 1, conv_start := 1]
+  data[, cstart := index - max_convolution]
+  data[cstart < 1, cstart := 1]
   
   # assign max convolution variable
-  data[, conv_max := index - conv_start + 1]
+  data[, cmax := index - cstart + 1]
   
   # assign column order
   setcolorder(data, c("location", "date", "time", "index", "init_obs",
-                      "conv_start", "conv_max", "primary", "secondary"))
+                      "cstart", "cmax", "primary", "secondary"))
   return(data)
 }
 
@@ -88,7 +88,7 @@ prepare.brmsid_convolution <- function(data, location, primary, secondary,
 #' @method id_priors brmsid_convolution
 #' @export
 id_priors.brmsid_convolution <- function(data, conv_type = "lognormal") {
-  
+
 }
 
 #' Define stan code for a delay convolution model
@@ -135,15 +135,15 @@ id_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
     stanvar(block = "functions", 
             scode = "
    vector convolve(int secondary, vector primary, real scale,
-                   real conv_mean, real conv_sd, int conv_max,
+                   real cmean, real csd, int cmax,
                    int index, int conv_start, int init) {
     real cs;
     if (init) {
       cs = to_real(secondary);
     }else{
-      vector[conv_max] pmf = calc_pmf(conv_mean, conv_sd, conv_max);       
+      vector[cmax] pmf = calc_pmf(cmean, csd, cmax);       
       real cp = 1e-5;
-      cp += dot_product(primary[conv_start:index], tail(pmf, conv_max));
+      cp += dot_product(primary[cstart:index], tail(pmf, cmax));
       cs = scale * cp; 
     }
     return(cs);
@@ -162,35 +162,52 @@ id_stancode.brmsid_convolution <- function(data, conv_type = "lognormal") {
 #' @param data A data.frame as produced by `prepare` that must contain the date, 
 #' location (as loc), primary (the data that the outcome is a convolution of)
 #' and at least the outcome as specifed in `formula`.
-#' @param conv_mean Formula for the convolution mean. Defaults to intercept
+#' @param cmean Formula for the convolution mean. Defaults to intercept
 #'  only.
-#' @param conv_sd Formula for the convolution standard deviation. Defaults to 
+#' @param csd Formula for the convolution standard deviation. Defaults to 
 #' intercept only.
 #' @param ... Additional parameters passed to `brms::brm`.
 #' @return A "brmsfit" object or stan code (if `dry = TRUE`).
 #' @method brmid brmsid_convolution
 #' @export
 #' @author Sam Abbott
-brmid.brmsid_convolution <- function(formula = ~ 1, conv_mean = ~ 1,
-                                     conv_sd = ~ 1, family = negbinomial(), 
-                                     data, priors, id_stancode, 
+#' @examples 
+#' # define some example data
+#' library(data.table)
+#' dt <- data.table(
+#'    region = "France", cases = seq(10, 500, by = 10),
+#'    date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
+#'    )
+#' dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+#' dt[is.na(deaths), deaths := 0]
+#' 
+#' dt <- prepare(
+#'   dt, model = "convolution", location = "region", 
+#'   primary = "cases", secondary = "deaths",
+#'   )
+#'   
+#'   
+#' brmid(data = dt, dry = TRUE)
+brmid.brmsid_convolution <- function(formula = ~ 1, cmean = ~ 1,
+                                     csd = ~ 1, family = negbinomial(), 
+                                     data, priors, custom_stancode, 
                                      use_default_formula = TRUE, dry = FALSE, 
                                      ...) {
   if (missing(priors)) {
     priors <- id_priors(data)
   }
-  
-  if (missing(id_stancode)) {
-    id_stancode <- id_stancode(data)
+   
+  if (missing(custom_stancode)) {
+    custom_stancode <- id_stancode(data)
   }
   
   if (use_default_formula) {
     form <- bf(
-      secondary ~ convolve(secondary, primary, scale, conv_mean, conv_sd, 
-                           conv_max, index, conv_start, init_obs),
-      as.formula(paste0("scale ", formula)), 
-      as.formula(paste0("conv_mean", conv_mean)),
-      as.formula(paste0("conv_sd", conv_sd)),
+      secondary ~ convolve(secondary, primary, scale, cmean, csd, 
+                           cmax, index, cstart, init_obs),
+      as.formula(paste0("scale ", paste(formula, collapse = " "))), 
+      as.formula(paste0("cmean", paste(cmean, collapse = " "))),
+      as.formula(paste0("csd",paste(csd, collapse = " "))),
       nl = TRUE
     )
   }else{
@@ -203,7 +220,7 @@ fit <- brm_fn(formula = form,
               data = data,
               data2 = list(primary = data$primary),
               prior = priors,
-              stanvars = id_stancode,
+              stanvars = custom_stancode,
               ...)
 return(fit)
 }
