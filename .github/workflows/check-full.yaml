@@ -7,7 +7,7 @@ name: R-CMD-check
 'on':
   push:
     branches:
-      - master
+      - main
   schedule:
     - cron: '0 0 * * *'
   pull_request:
