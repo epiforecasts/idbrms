@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# id.brms: Infectious Disease Modelling using brms
+# idbrms: Infectious Disease Modelling using brms
 
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
@@ -23,6 +23,6 @@ You can install the unstable development version from [GitHub](https://github.co
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("epiforecasts/id.brms")
+devtools::install_github("epiforecasts/idbrms")
 ```
 

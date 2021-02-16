@@ -92,6 +92,11 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 }
 
 #' Define priors for the delay convolution model
+#' 
+#' @param data A data.frame as produced by `prepare` that must contain the date, 
+#' location (as loc), primary (the data that the outcome is a convolution of)
+#' and secondary (the observation of interest. Should have class
+#'  "idbrms_convolution".
 #' @param scale Vector of length two defining the mean and the standard
 #' deviation of the normal prior for the scaling factor.
 #' @param cmean Vector of length two defining the mean and standard deviation of
@@ -107,7 +112,7 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 #' id_priors(x)
 id_priors.idbrms_convolution <- function(data, 
                                          scale = c(round(log(0.1), 2), 0.05), 
-                                         cmean = c(2.5, 1), 
+                                         cmean = c(2.5, 1),
                                          lcsd = c(-0.5, 0.25)) {
   
   priors <- set_prior(paste0("normal(", scale[1], ",", scale[2], ")"), 
@@ -124,13 +129,14 @@ id_priors.idbrms_convolution <- function(data,
 
 #' Define stan code for a delay convolution model
 #' 
+#' @inheritParams id_priors.idbrms_convolution
 #' @method id_stancode idbrms_convolution
 #' @export
 #' @examples 
 #' x <- 1
 #' class(x) <- "brmsid_convolution"
 #' custom_stan <- id_stancode(x)
-id_stancode.idbrms_convolution <- function(data) {
+id_stancode.idbrms_convolution <- function(data, ...) {
   stanvars <- c(
     stanvar(block = "functions",
             scode = "
@@ -165,9 +171,9 @@ id_stancode.idbrms_convolution <- function(data) {
     }"),
     stanvar(block = "functions", 
             scode = "
-   vector convolve(int[] primary, vector scale,
-                   vector cmean, vector  lcsd, int[] cmax,
-                   int[] index, int[] cstart, int[] init) {
+   vector idbrms_convolve(int[] primary, vector scale, vector cmean, 
+                          vector  lcsd, int[] cmax, int[] index, int[] cstart,
+                          int[] init) {
     int n = num_elements(scale);
     vector[n] p = to_vector(primary);
     vector[n] ils = inv_logit(scale);
@@ -184,6 +190,31 @@ id_stancode.idbrms_convolution <- function(data) {
   }"))
 }
 
+#' Define a formula for the convolution model
+#' @export
+#' @inheritParams id_priors.idbrms_convolution
+#' @param scale Formula for the scaling of primary observations to secondary
+#' observations.
+#' @param cmean Formula for the convolution mean. Defaults to intercept
+#'  only.
+#' @param csd Formula for the convolution standard deviation. Defaults to 
+#' intercept only.
+#' @rdname id_formula
+#' @author Sam Abbott
+#' @inherit id_formula.idbrms_convolution examples
+id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
+                                          lcsd = ~ 1, ...) {
+  form <- bf(
+    secondary ~ idbrms_convolve(primary, scale, cmean, lcsd, cmax, index,
+                                cstart, init_obs),
+    as.formula(paste0("scale ", paste(scale, collapse = " "))), 
+    as.formula(paste0("cmean", paste(cmean, collapse = " "))),
+    as.formula(paste0("lcsd",paste(lcsd, collapse = " "))),
+    nl = TRUE, loop = FALSE
+  )
+  return(form)
+}
+
 #' Delay Convolution Model
 #'
 #' @description A model that assumes that a secondary observations can be 
@@ -192,14 +223,8 @@ id_stancode.idbrms_convolution <- function(data) {
 #' case fatality rate (with the primary observation being cases and the
 #' secondary observation being deaths) and then explore factors that influence 
 #' it.
-#' @param formula A model formula
-#' @param data A data.frame as produced by `prepare` that must contain the date, 
-#' location (as loc), primary (the data that the outcome is a convolution of)
-#' and at least the outcome as specifed in `formula`.
-#' @param cmean Formula for the convolution mean. Defaults to intercept
-#'  only.
-#' @param csd Formula for the convolution standard deviation. Defaults to 
-#' intercept only.
+#' @inheritParams id_priors.idbrms_convolution
+#' @inheritParams idbrm
 #' @param ... Additional parameters passed to `brms::brm`.
 #' @return A "brmsfit" object or stan code (if `dry = TRUE`).
 #' @method idbrm idbrms_convolution
@@ -220,42 +245,16 @@ id_stancode.idbrms_convolution <- function(data) {
 #'   primary = "cases", secondary = "deaths",
 #'   )
 #'   
-#' fit <- idbrms(data = dt)
-idbrm.idbrms_convolution <- function(formula = ~ 1, cmean = ~ 1,
-                                     csd = ~ 1, family = negbinomial(link = "identity"), 
-                                     data, priors, custom_stancode, 
-                                     use_default_formula = TRUE, dry = FALSE, 
-                                     ...) {
-  if (missing(priors)) {
-    priors <- id_priors(data)
-  }
-   
-  if (missing(custom_stancode)) {
-    custom_stancode <- id_stancode(data)
-  }
-  
-  if (use_default_formula) {
-    form <- bf(
-      secondary ~ convolve(primary, scale, cmean, lcsd, 
-                           cmax, index, cstart, init_obs),
-      as.formula(paste0("scale ", paste(formula, collapse = " "))), 
-      as.formula(paste0("cmean", paste(cmean, collapse = " "))),
-      as.formula(paste0("lcsd",paste(csd, collapse = " "))),
-      nl = TRUE, loop = FALSE
-    )
-  }else{
-    form <- formula
-  }
-
-brm_fn <- ifelse(dry, make_stancode, brm)
-fit <- brm_fn(formula = form,
-              family = family,
-              data = data,
-              data2 = list(primary = data$primary),
-              prior = priors,
-              stanvars = custom_stancode,
-              ...)
-
-class(fit) <- c(class(fit), "idbrmsfit")
+#' fit <- idbrm(data = dt)
+idbrm.idbrms_convolution <- function(formula = id.brms::id_formula(data),
+                                     family = negbinomial(link = "identity"), 
+                                     priors = id.brms::id_priors(data), 
+                                     custom_stancode = id.brms::id_stancode(data), 
+                                     data, dry = FALSE, ...) {
+fit <- idbrmfit(formula = formula, 
+                family = family, 
+                priors = priors, 
+                custom_stancode = custom_stancode,
+                data = data, dry = dry, ...)
 return(fit)
 }

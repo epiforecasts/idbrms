@@ -27,6 +27,7 @@ prepare.default <- function(data, model, ...) {
 
 #' Define model specific priors
 #' @export
+#' @inheritParams idbrm
 #' @rdname id_priors
 #' @author Sam Abbott
 #' @inherit id_priors.idbrms_convolution examples
@@ -36,6 +37,7 @@ id_priors <- function(data, ...) {
 
 #' Define model specific stancode
 #' @export
+#' @inheritParams idbrm
 #' @rdname id_stancode
 #' @author Sam Abbott
 #' @inherit id_stancode.idbrms_convolution examples
@@ -43,9 +45,22 @@ id_stancode <- function(data, ...) {
   UseMethod("id_stancode")
 }
 
-#' Infectious disease modelling wrapper for brm
-#' @param formula Formula of the main regression equation for the `idbrm` model.
-#' @param data A data frame as prepared for modelling using `prepare`.
+#' Define a model specific formula
+#' @export
+#' @inheritParams idbrm
+#' @rdname id_formula
+#' @author Sam Abbott
+#' @inherit id_formula.idbrms_convolution examples
+id_formula <- function(data, ...) {
+  UseMethod("id_formula")
+}
+
+#' Interface for infectious disease modelling using brms.
+#' 
+#' @param formula A formula as defined using `id_formula` or as supported by
+#' `brms::brm`.
+#' @param data A data frame as prepared for modelling using `prepare` with a 
+#' class associated with the model prepared for.
 #' @param dry Logical, defaults to TRUE. For testing purposes should just the `stan`
 #' code be output with not fitting done.
 #' @param family A observation model family as defined in `brms`.
@@ -54,16 +69,14 @@ id_stancode <- function(data, ...) {
 #' @param custom_stancode A list of `stanvars` used to define custom stancode in 
 #' `brms`. By default uses the code designed for the model class being fit (as
 #' specified using `id_stancode`).
-#' @param use_default_formula Logical, defaults to `TRUE`. Should the default 
-#' formula for the model class being fit be used or should the user defined 
-#' formulate override it (useful when specifying alternative non-linear 
-#' frameworks to the default).
 #' @rdname brmid
+#' @inheritParams idbrmfit
 #' @export
 #' @author Sam Abbott
 #' @import brms
 #' @inherit idbrm.idbrms_convolution examples
-idbrm <- function(formula, data, family, priors, custom_stan,
-                  dry = FALSE, use_default_formula = TRUE, ...) {
+idbrm <- function(formula, data, family, priors, custom_stan, dry = FALSE,
+                  ...) {
   UseMethod("idbrm")
 }
+

@@ -12,6 +12,11 @@
 )
 }
 \arguments{
+\item{data}{A data.frame as produced by \code{prepare} that must contain the date,
+location (as loc), primary (the data that the outcome is a convolution of)
+and secondary (the observation of interest. Should have class
+"idbrms_convolution".}
+
 \item{scale}{Vector of length two defining the mean and the standard
 deviation of the normal prior for the scaling factor.}
 
