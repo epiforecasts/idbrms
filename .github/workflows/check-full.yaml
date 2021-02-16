@@ -1,7 +1,6 @@
 ---
 # Github Actions workflow to check idbrms
 # yamllint disable rule:line-length
-
 name: R-CMD-check
 
 'on':
