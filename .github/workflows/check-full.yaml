@@ -251,7 +251,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   test-coverage:
-    if: github.ref == 'refs/heads/master' && github.repository == 'epiforecasts/idbrms'
+    if: github.ref == 'refs/heads/main' && github.repository == 'epiforecasts/idbrms'
     runs-on: macOS-latest
 
     needs: [R-CMD-check]
@@ -289,7 +289,7 @@ jobs:
 
 
   pkgdown:
-    if: github.ref == 'refs/heads/master' && github.repository == 'epiforecasts/idbrms'
+    if: github.ref == 'refs/heads/main' && github.repository == 'epiforecasts/idbrms'
     runs-on: macOS-latest
 
     needs: [R-CMD-check, Lint, Format, test-coverage]
@@ -335,7 +335,7 @@ jobs:
         shell: bash
 
   push_to_registry:
-    if: github.ref == 'refs/heads/master' && github.repository == 'epiforecasts/idbrms'
+    if: github.ref == 'refs/heads/main' && github.repository == 'epiforecasts/idbrms'
     name: Push Docker image to GitHub Packages
     runs-on: ubuntu-20.04
 
