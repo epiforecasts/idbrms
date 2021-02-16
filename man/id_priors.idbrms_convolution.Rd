@@ -8,7 +8,8 @@
   data,
   scale = c(round(log(0.1), 2), 0.05),
   cmean = c(2.5, 1),
-  lcsd = c(-0.5, 0.25)
+  lcsd = c(-0.5, 0.25),
+  ...
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ the log mean of the delay distribution.}
 \item{lcsd}{Vector of length two defining the mean and standard deviation of
 the log standard deviation logged.
 the standard deviation to be greater than 0 on the unconstrained scale.}
+
+\item{...}{Additional arguments for method.}
 }
 \description{
 Define priors for the delay convolution model

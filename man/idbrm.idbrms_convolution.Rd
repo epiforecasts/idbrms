@@ -5,10 +5,10 @@
 \title{Delay Convolution Model}
 \usage{
 \method{idbrm}{idbrms_convolution}(
-  formula = id.brms::id_formula(data),
+  formula = idbrms::id_formula(data),
   family = negbinomial(link = "identity"),
-  priors = id.brms::id_priors(data),
-  custom_stancode = id.brms::id_stancode(data),
+  priors = idbrms::id_priors(data),
+  custom_stancode = idbrms::id_stancode(data),
   data,
   dry = FALSE,
   ...

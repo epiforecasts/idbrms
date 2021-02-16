@@ -4,28 +4,28 @@
 \alias{idbrm}
 \title{Interface for infectious disease modelling using brms.}
 \usage{
-idbrm(formula, data, family, priors, custom_stan, dry = FALSE, ...)
+idbrm(formula, family, priors, custom_stancode, data, dry = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula as defined using \code{id_formula} or as supported by
 \code{brms::brm}.}
-
-\item{data}{A data frame as prepared for modelling using \code{prepare} with a
-class associated with the model prepared for.}
 
 \item{family}{A observation model family as defined in \code{brms}.}
 
 \item{priors}{A list of priors as defined using \code{brms} or \code{id_priors}.
 Defaults to the the \code{id_priors} defined for the model class being fit.}
 
+\item{custom_stancode}{A list of \code{stanvars} used to define custom stancode in
+\code{brms}. By default uses the code designed for the model class being fit (as
+specified using \code{id_stancode}).}
+
+\item{data}{A data frame as prepared for modelling using \code{prepare} with a
+class associated with the model prepared for.}
+
 \item{dry}{Logical, defaults to TRUE. For testing purposes should just the \code{stan}
 code be output with not fitting done.}
 
 \item{...}{Additional arguments to pass to \code{brms::brm}.}
-
-\item{custom_stancode}{A list of \code{stanvars} used to define custom stancode in
-\code{brms}. By default uses the code designed for the model class being fit (as
-specified using \code{id_stancode}).}
 }
 \description{
 Interface for infectious disease modelling using brms.

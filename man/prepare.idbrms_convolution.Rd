@@ -10,7 +10,8 @@
   primary,
   secondary,
   initial_obs = 14,
-  max_convolution = 30
+  max_convolution = 30,
+  ...
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ the estimated delay distribution. Defaults to 14 days.}
 
 \item{max_convolution}{Integer defining the maximum index to use for the
 convolution. Defaults to 30 days.}
+
+\item{...}{Additional arguments passed to model specific prepare functions}
 }
 \description{
 Prepare data for fitting using a convolution model

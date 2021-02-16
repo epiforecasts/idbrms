@@ -13,6 +13,7 @@
 #' @param max_convolution Integer defining the maximum index to use for the
 #'  convolution. Defaults to 30 days.
 #' @method prepare idbrms_convolution
+#' @inheritParams prepare
 #' @export
 #' @author Sam Abbott
 #' @examples
@@ -31,7 +32,11 @@
 #'   )
 #' dt[]
 prepare.idbrms_convolution <- function(data, location, primary, secondary, 
-                                       initial_obs = 14, max_convolution = 30) {
+                                       initial_obs = 14, max_convolution = 30,
+                                       ...) {
+  # deal with global warnings
+  time <- index <- init_obs <- cstart <- cmax <- NULL
+  
   # convert to data.table
   data <- as.data.table(data)
 
@@ -105,6 +110,7 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 #' the log standard deviation logged.
 #' the standard deviation to be greater than 0 on the unconstrained scale.
 #' @method id_priors idbrms_convolution
+#' @inheritParams id_priors
 #' @export
 #' @examples
 #' x <- 1
@@ -113,8 +119,8 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 id_priors.idbrms_convolution <- function(data, 
                                          scale = c(round(log(0.1), 2), 0.05), 
                                          cmean = c(2.5, 1),
-                                         lcsd = c(-0.5, 0.25)) {
-  
+                                         lcsd = c(-0.5, 0.25), ...) {
+  normal <- NULL
   priors <- set_prior(paste0("normal(", scale[1], ",", scale[2], ")"), 
                       nlpar = "scale", coef = "Intercept") +
     set_prior(paste0("normal(", cmean[1], ",", cmean[2], ")"), 
@@ -134,7 +140,7 @@ id_priors.idbrms_convolution <- function(data,
 #' @export
 #' @examples 
 #' x <- 1
-#' class(x) <- "brmsid_convolution"
+#' class(x) <- "idbrms_convolution"
 #' custom_stan <- id_stancode(x)
 id_stancode.idbrms_convolution <- function(data, ...) {
   stanvars <- c(
@@ -197,11 +203,12 @@ id_stancode.idbrms_convolution <- function(data, ...) {
 #' observations.
 #' @param cmean Formula for the convolution mean. Defaults to intercept
 #'  only.
-#' @param csd Formula for the convolution standard deviation. Defaults to 
-#' intercept only.
+#' @param lcsd Formula for the logged convolution standard deviation. Defaults
+#'  to intercept only.
 #' @rdname id_formula
 #' @author Sam Abbott
 #' @inherit id_formula.idbrms_convolution examples
+#' @importFrom stats as.formula
 id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
                                           lcsd = ~ 1, ...) {
   form <- bf(
@@ -246,10 +253,10 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #'   )
 #'   
 #' fit <- idbrm(data = dt)
-idbrm.idbrms_convolution <- function(formula = id.brms::id_formula(data),
+idbrm.idbrms_convolution <- function(formula = idbrms::id_formula(data),
                                      family = negbinomial(link = "identity"), 
-                                     priors = id.brms::id_priors(data), 
-                                     custom_stancode = id.brms::id_stancode(data), 
+                                     priors = idbrms::id_priors(data), 
+                                     custom_stancode = idbrms::id_stancode(data), 
                                      data, dry = FALSE, ...) {
 fit <- idbrmfit(formula = formula, 
                 family = family, 

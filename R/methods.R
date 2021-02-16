@@ -28,6 +28,7 @@ prepare.default <- function(data, model, ...) {
 #' Define model specific priors
 #' @export
 #' @inheritParams idbrm
+#' @param ... Additional arguments for method.
 #' @rdname id_priors
 #' @author Sam Abbott
 #' @inherit id_priors.idbrms_convolution examples
@@ -37,7 +38,7 @@ id_priors <- function(data, ...) {
 
 #' Define model specific stancode
 #' @export
-#' @inheritParams idbrm
+#' @inheritParams id_priors
 #' @rdname id_stancode
 #' @author Sam Abbott
 #' @inherit id_stancode.idbrms_convolution examples
@@ -47,7 +48,7 @@ id_stancode <- function(data, ...) {
 
 #' Define a model specific formula
 #' @export
-#' @inheritParams idbrm
+#' @inheritParams id_priors
 #' @rdname id_formula
 #' @author Sam Abbott
 #' @inherit id_formula.idbrms_convolution examples
@@ -75,7 +76,7 @@ id_formula <- function(data, ...) {
 #' @author Sam Abbott
 #' @import brms
 #' @inherit idbrm.idbrms_convolution examples
-idbrm <- function(formula, data, family, priors, custom_stan, dry = FALSE,
+idbrm <- function(formula, family, priors, custom_stancode, data, dry = FALSE,
                   ...) {
   UseMethod("idbrm")
 }

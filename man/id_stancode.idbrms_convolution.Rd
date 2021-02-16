@@ -11,12 +11,14 @@
 location (as loc), primary (the data that the outcome is a convolution of)
 and secondary (the observation of interest. Should have class
 "idbrms_convolution".}
+
+\item{...}{Additional arguments for method.}
 }
 \description{
 Define stan code for a delay convolution model
 }
 \examples{
 x <- 1
-class(x) <- "brmsid_convolution"
+class(x) <- "idbrms_convolution"
 custom_stan <- id_stancode(x)
 }

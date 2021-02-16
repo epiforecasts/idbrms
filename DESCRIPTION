@@ -16,3 +16,7 @@ RoxygenNote: 7.1.1
 Imports: 
     brms,
     data.table
+Suggests: 
+    covr,
+    spelling
+Language: en-US

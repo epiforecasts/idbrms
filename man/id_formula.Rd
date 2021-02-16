@@ -21,14 +21,10 @@ observations.}
 \item{cmean}{Formula for the convolution mean. Defaults to intercept
 only.}
 
-\item{lcsd}{Vector of length two defining the mean and standard deviation of
-the log standard deviation logged.
-the standard deviation to be greater than 0 on the unconstrained scale.}
+\item{lcsd}{Formula for the logged convolution standard deviation. Defaults
+to intercept only.}
 
-\item{...}{Additional arguments to pass to \code{brms::brm}.}
-
-\item{csd}{Formula for the convolution standard deviation. Defaults to
-intercept only.}
+\item{...}{Additional arguments for method.}
 }
 \description{
 Define a formula for the convolution model

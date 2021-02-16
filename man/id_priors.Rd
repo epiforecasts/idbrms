@@ -10,7 +10,7 @@ id_priors(data, ...)
 \item{data}{A data frame as prepared for modelling using \code{prepare} with a
 class associated with the model prepared for.}
 
-\item{...}{Additional arguments to pass to \code{brms::brm}.}
+\item{...}{Additional arguments for method.}
 }
 \description{
 Define model specific priors
