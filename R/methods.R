@@ -76,7 +76,7 @@ id_formula <- function(data, ...) {
 #' @author Sam Abbott
 #' @import brms
 #' @inherit idbrm.idbrms_convolution examples
-idbrm <- function(formula, family, priors, custom_stancode, data, dry = FALSE,
+idbrm <- function(data, formula, family, priors, custom_stancode, dry = FALSE,
                   ...) {
   UseMethod("idbrm")
 }

@@ -219,6 +219,7 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
     as.formula(paste0("lcsd",paste(lcsd, collapse = " "))),
     nl = TRUE, loop = FALSE
   )
+  class(form) <- c(class(form), "idbrms_convolution")
   return(form)
 }
 
@@ -253,11 +254,11 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #'   )
 #'   
 #' fit <- idbrm(data = dt)
-idbrm.idbrms_convolution <- function(formula = idbrms::id_formula(data),
+idbrm.idbrms_convolution <- function(data, formula = idbrms::id_formula(data),
                                      family = negbinomial(link = "identity"), 
                                      priors = idbrms::id_priors(data), 
                                      custom_stancode = idbrms::id_stancode(data), 
-                                     data, dry = FALSE, ...) {
+                                     dry = FALSE, ...) {
 fit <- idbrmfit(formula = formula, 
                 family = family, 
                 priors = priors, 

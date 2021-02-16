@@ -5,16 +5,21 @@
 \title{Delay Convolution Model}
 \usage{
 \method{idbrm}{idbrms_convolution}(
+  data,
   formula = idbrms::id_formula(data),
   family = negbinomial(link = "identity"),
   priors = idbrms::id_priors(data),
   custom_stancode = idbrms::id_stancode(data),
-  data,
   dry = FALSE,
   ...
 )
 }
 \arguments{
+\item{data}{A data.frame as produced by \code{prepare} that must contain the date,
+location (as loc), primary (the data that the outcome is a convolution of)
+and secondary (the observation of interest. Should have class
+"idbrms_convolution".}
+
 \item{formula}{A formula as defined using \code{id_formula} or as supported by
 \code{brms::brm}.}
 
@@ -26,11 +31,6 @@ Defaults to the the \code{id_priors} defined for the model class being fit.}
 \item{custom_stancode}{A list of \code{stanvars} used to define custom stancode in
 \code{brms}. By default uses the code designed for the model class being fit (as
 specified using \code{id_stancode}).}
-
-\item{data}{A data.frame as produced by \code{prepare} that must contain the date,
-location (as loc), primary (the data that the outcome is a convolution of)
-and secondary (the observation of interest. Should have class
-"idbrms_convolution".}
 
 \item{dry}{Logical, defaults to TRUE. For testing purposes should just the \code{stan}
 code be output with not fitting done.}
