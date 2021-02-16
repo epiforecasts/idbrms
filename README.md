@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# brms.id: Infectious Disease Modelling using brms
+# id.brms: Infectious Disease Modelling using brms
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
@@ -13,5 +13,5 @@ You can install the unstable development version from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("epiforecasts/brms.id")
+devtools::install_github("epiforecasts/id.brms")
 ```

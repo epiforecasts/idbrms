@@ -12,7 +12,7 @@
 #' the estimated delay distribution. Defaults to 14 days.
 #' @param max_convolution Integer defining the maximum index to use for the
 #'  convolution. Defaults to 30 days.
-#' @method prepare brmsid_convolution
+#' @method prepare idbrms_convolution
 #' @export
 #' @author Sam Abbott
 #' @examples
@@ -30,7 +30,7 @@
 #'   primary = "cases", secondary = "deaths",
 #'   )
 #' dt[]
-prepare.brmsid_convolution <- function(data, location, primary, secondary, 
+prepare.idbrms_convolution <- function(data, location, primary, secondary, 
                                        initial_obs = 14, max_convolution = 30) {
   # convert to data.table
   data <- as.data.table(data)
@@ -99,13 +99,13 @@ prepare.brmsid_convolution <- function(data, location, primary, secondary,
 #' @param lcsd Vector of length two defining the mean and standard deviation of
 #' the log standard deviation logged.
 #' the standard deviation to be greater than 0 on the unconstrained scale.
-#' @method id_priors brmsid_convolution
+#' @method id_priors idbrms_convolution
 #' @export
 #' @examples
 #' x <- 1
-#' class(x) <- "brmsid_convolution"
+#' class(x) <- "idbrms_convolution"
 #' id_priors(x)
-id_priors.brmsid_convolution <- function(data, 
+id_priors.idbrms_convolution <- function(data, 
                                          scale = c(round(log(0.1), 2), 0.05), 
                                          cmean = c(2.5, 1), 
                                          lcsd = c(-0.5, 0.25)) {
@@ -124,13 +124,13 @@ id_priors.brmsid_convolution <- function(data,
 
 #' Define stan code for a delay convolution model
 #' 
-#' @method id_stancode brmsid_convolution
+#' @method id_stancode idbrms_convolution
 #' @export
 #' @examples 
 #' x <- 1
 #' class(x) <- "brmsid_convolution"
 #' custom_stan <- id_stancode(x)
-id_stancode.brmsid_convolution <- function(data) {
+id_stancode.idbrms_convolution <- function(data) {
   stanvars <- c(
     stanvar(block = "functions",
             scode = "
@@ -202,7 +202,7 @@ id_stancode.brmsid_convolution <- function(data) {
 #' intercept only.
 #' @param ... Additional parameters passed to `brms::brm`.
 #' @return A "brmsfit" object or stan code (if `dry = TRUE`).
-#' @method brmid brmsid_convolution
+#' @method idbrm idbrms_convolution
 #' @export
 #' @author Sam Abbott
 #' @examples 
@@ -220,8 +220,8 @@ id_stancode.brmsid_convolution <- function(data) {
 #'   primary = "cases", secondary = "deaths",
 #'   )
 #'   
-#' fit <- brmid(data = dt)
-brmid.brmsid_convolution <- function(formula = ~ 1, cmean = ~ 1,
+#' fit <- idbrms(data = dt)
+idbrm.idbrms_convolution <- function(formula = ~ 1, cmean = ~ 1,
                                      csd = ~ 1, family = negbinomial(link = "identity"), 
                                      data, priors, custom_stancode, 
                                      use_default_formula = TRUE, dry = FALSE, 
@@ -255,5 +255,7 @@ fit <- brm_fn(formula = form,
               prior = priors,
               stanvars = custom_stancode,
               ...)
+
+class(fit) <- c(class(fit), "idbrmsfit")
 return(fit)
 }

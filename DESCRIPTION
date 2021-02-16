@@ -1,4 +1,4 @@
-Package: brms.id
+Package: id.brms
 Title: Infectious Disease Modelling Using brms
 Version: 0.0.0.9000
 Authors@R: 
