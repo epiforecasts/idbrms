@@ -8,6 +8,9 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![Codecov test
 coverage](https://codecov.io/gh/epiforecasts/brms.ide/branch/master/graph/badge.svg)](https://codecov.io/gh/epiforecasts/brms.ide?branch=master)
 
+Provides population-level infectious disease models as an extension of
+`brms`.
+
 ## Installation
 
 You can install the unstable development version from
