@@ -31,6 +31,7 @@ code be output with not fitting done.}
 Interface for infectious disease modelling using brms.
 }
 \examples{
+\donttest{
 # define some example data
 library(data.table)
 dt <- data.table(
@@ -47,6 +48,7 @@ dt <- prepare(
 
 # fit the convolution model using a Poisson observation model
 fit <- idbrm(data = dt, family = poisson(link = "identity"))
+}
 }
 \author{
 Sam Abbott

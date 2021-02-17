@@ -21,7 +21,6 @@ prepare <- function(data, ...) {
 prepare.default <- function(data, model, ...) {
   model <- match.arg(model, choices = c("convolution"))
   class(data) <- c(class(data), paste0("idbrms_", model))
-
   prepare(data, ...)
 }
 

@@ -21,7 +21,6 @@ idbrmfit <- function(formula, data, family, priors, custom_stancode,
                 prior = priors,
                 stanvars = custom_stancode,
                 ...)
-  
   class(fit) <- c(class(fit), "idbrmsfit")
   return(fit)
 }

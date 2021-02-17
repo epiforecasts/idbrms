@@ -233,6 +233,7 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #' @export
 #' @author Sam Abbott
 #' @examples 
+#' \donttest{
 #' # define some example data
 #' library(data.table)
 #' dt <- data.table(
@@ -249,6 +250,7 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #'
 #' # fit the convolution model using a Poisson observation model
 #' fit <- idbrm(data = dt, family = poisson(link = "identity"))
+#' }
 idbrm.idbrms_convolution <- function(data, formula = idbrms::id_formula(data),
                                      family = negbinomial(link = "identity"), 
                                      priors = idbrms::id_priors(data), 
