@@ -17,8 +17,6 @@ and secondary (the observation of interest. Should have class
 \description{
 Define stan code for a delay convolution model
 }
-\examples{
-x <- 1
-class(x) <- "idbrms_convolution"
-custom_stan <- id_stancode(x)
+\author{
+Sam Abbott
 }

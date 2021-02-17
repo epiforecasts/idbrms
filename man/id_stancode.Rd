@@ -15,11 +15,6 @@ class associated with the model prepared for.}
 \description{
 Define model specific stancode
 }
-\examples{
-x <- 1
-class(x) <- "idbrms_convolution"
-custom_stan <- id_stancode(x)
-}
 \author{
 Sam Abbott
 }

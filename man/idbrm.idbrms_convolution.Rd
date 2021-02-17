@@ -62,8 +62,9 @@ dt <- prepare(
   dt, model = "convolution", location = "region", 
   primary = "cases", secondary = "deaths",
   )
-  
-fit <- idbrm(data = dt)
+
+# fit the convolution model using a Poisson observation model
+fit <- idbrm(data = dt, family = poisson(link = "identity"))
 }
 \author{
 Sam Abbott

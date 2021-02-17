@@ -111,6 +111,7 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 #' the standard deviation to be greater than 0 on the unconstrained scale.
 #' @method id_priors idbrms_convolution
 #' @inheritParams id_priors
+#' @author Sam Abbott
 #' @export
 id_priors.idbrms_convolution <- function(data, 
                                          scale = c(round(log(0.1), 2), 0.05), 
@@ -133,11 +134,8 @@ id_priors.idbrms_convolution <- function(data,
 #' 
 #' @inheritParams id_priors.idbrms_convolution
 #' @method id_stancode idbrms_convolution
+#' @author Sam Abbott
 #' @export
-#' @examples 
-#' x <- 1
-#' class(x) <- "idbrms_convolution"
-#' custom_stan <- id_stancode(x)
 id_stancode.idbrms_convolution <- function(data, ...) {
   stanvars <- c(
     stanvar(block = "functions",
@@ -248,8 +246,9 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #'   dt, model = "convolution", location = "region", 
 #'   primary = "cases", secondary = "deaths",
 #'   )
-#'   
-#' fit <- idbrm(data = dt)
+#'
+#' # fit the convolution model using a Poisson observation model
+#' fit <- idbrm(data = dt, family = poisson(link = "identity"))
 idbrm.idbrms_convolution <- function(data, formula = idbrms::id_formula(data),
                                      family = negbinomial(link = "identity"), 
                                      priors = idbrms::id_priors(data), 
