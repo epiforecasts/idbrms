@@ -112,10 +112,6 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 #' @method id_priors idbrms_convolution
 #' @inheritParams id_priors
 #' @export
-#' @examples
-#' x <- 1
-#' class(x) <- "idbrms_convolution"
-#' id_priors(x)
 id_priors.idbrms_convolution <- function(data, 
                                          scale = c(round(log(0.1), 2), 0.05), 
                                          cmean = c(2.5, 1),

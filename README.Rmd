@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # idbrms: Infectious Disease Modelling using brms
 
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+![R-CMD-check](https://github.com/epiforecasts/idbrms/workflows/R-CMD-check/badge.svg)
 [![Codecov test coverage](https://codecov.io/gh/epiforecasts/brms.ide/branch/master/graph/badge.svg)](https://codecov.io/gh/epiforecasts/brms.ide?branch=master)
 
 Provides population-level infectious disease models as an extension of `brms`.
@@ -31,42 +32,78 @@ devtools::install_github("epiforecasts/idbrms")
 
 ## Example
 
-* Load `idbrms`, `brms` and `data.table` (used for manipulating data).
+* Load `idbrms`, `brms`, `data.table` (used for manipulating data), and `ggplot2` for visualisation.
 
 ```{r packages, message = FALSE}
 library(idbrms)
 library(brms)
 library(data.table)
+library(ggplot2)
 ```
 
-* Define toy data with a fixed 5 day lag between observations.
+* Define simulated data containing cases of some infectious disease over time in a single region (with an initial growth of 20% a day followed by a decline of 10% a day). We then assume that deaths are a convolution of cases using a log normal distribution with a log mean of 1.6 (standard deviation 0.2) and a log standard deviation of 0.8 (standard deviation 0.2), and are then scaled by a fraction (here 0.4 (standard deviation 0.025)).
 
 ```{r toy-data}
-dt <- data.table(
-  region = "France", cases = seq(10, 500, by = 10),
+# apply a convolution of a log normal to a vector of observations
+weight_cmf <- function(x, ...) {
+   set.seed(x[1])
+   meanlog <- rnorm(1, 1.6, 0.2)
+   sdlog <- rnorm(1, 0.8, 0.1)
+   cmf <- cumsum(dlnorm(1:length(x), meanlog, sdlog)) -
+     cumsum(dlnorm(0:(length(x) - 1), meanlog, sdlog))
+   conv <- sum(x * rev(cmf), na.rm = TRUE)
+   conv <- round(conv, 0)
+  return(conv)
+}
+
+obs <- data.table(
+  region = "Glastonbury", 
+  cases = as.integer(c(10 * exp(0.2 * 1:25), 
+                       10 * exp(0.2 * 25) * exp(-0.1 * 1:25))),
   date = seq(as.Date("2020-10-01"), by = "days", length.out = 50))
-dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
-dt[is.na(deaths), deaths := 0]
+# roll over observed cases to produce a convolution
+obs <- obs[, deaths := frollapply(cases, 15, weight_cmf, align = "right")]
+obs <- obs[!is.na(deaths)]
+obs <- obs[, deaths := round(deaths * rnorm(.N, 0.4, 0.025), 0)]
+obs <- obs[deaths < 0, deaths := 0]
+```
+
+* Visual simulated data (columns are cases and points are deaths).
+
+```{r}
+ggplot(obs) +
+  aes(x = date, y = cases) +
+  geom_col(fill = "lightgrey") +
+  geom_point(aes(y = deaths)) +
+  theme_minimal()
 ```
 
 * Prepare the data to be fit using the convolution model. 
 
 ```{r prep-data}
-dt <- prepare(dt, model = "convolution", location = "region",
-              primary = "cases", secondary = "deaths")
-head(dt, 10)
+prep_obs <- prepare(obs, model = "convolution", location = "region",
+                    primary = "cases", secondary = "deaths")
+head(prep_obs, 10)
 ```
 
-* Fit the model.
+* Fit the model assuming a Poisson observation model (*It is important to use an identity link here as `idbrm` provides its own link by default*).
 
 ```{r fit-model-eval, include = FALSE}
-fit <- idbrm(data = dt)
+fit <- idbrm(data = prep_obs, family = poisson(link = "identity"))
 summary(fit)
 ```
 
 ```{r fit-model, eval = FALSE}
-fit <- idbrm(data = dt)
+fit <- idbrm(data = dt, family = poisson(link = "identity"))
 summary(fit)
+```
+
+* Explore estimated effect sizes (we approximately should recover those used for simulation).
+
+```{r}
+exp(posterior_summary(fit, "scale_Intercept"))
+posterior_summary(fit, "cmean_Intercept")
+exp(posterior_summary(fit, "lcsd_Intercept"))
 ```
 
 * Expose model stan functions.

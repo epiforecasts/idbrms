@@ -33,8 +33,3 @@ the standard deviation to be greater than 0 on the unconstrained scale.}
 \description{
 Define priors for the delay convolution model
 }
-\examples{
-x <- 1
-class(x) <- "idbrms_convolution"
-id_priors(x)
-}

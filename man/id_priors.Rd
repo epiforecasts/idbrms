@@ -15,11 +15,6 @@ class associated with the model prepared for.}
 \description{
 Define model specific priors
 }
-\examples{
-x <- 1
-class(x) <- "idbrms_convolution"
-id_priors(x)
-}
 \author{
 Sam Abbott
 }
