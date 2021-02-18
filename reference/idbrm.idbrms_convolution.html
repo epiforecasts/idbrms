@@ -127,10 +127,10 @@ it.</p>
     <pre class="usage"><span class='co'># S3 method for idbrms_convolution</span>
 <span class='fu'><a href='idbrm.html'>idbrm</a></span><span class='op'>(</span>
   <span class='va'>data</span>,
-  formula <span class='op'>=</span> <span class='fu'>idbrms</span><span class='fu'>::</span><span class='fu'><a href='id_formula.idbrms_convolution.html'>id_formula</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
+  formula <span class='op'>=</span> <span class='fu'><a href='id_formula.idbrms_convolution.html'>id_formula</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
   family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/brms/man/brmsfamily.html'>negbinomial</a></span><span class='op'>(</span>link <span class='op'>=</span> <span class='st'>"identity"</span><span class='op'>)</span>,
-  priors <span class='op'>=</span> <span class='fu'>idbrms</span><span class='fu'>::</span><span class='fu'><a href='id_priors.html'>id_priors</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
-  custom_stancode <span class='op'>=</span> <span class='fu'>idbrms</span><span class='fu'>::</span><span class='fu'><a href='id_stancode.html'>id_stancode</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
+  priors <span class='op'>=</span> <span class='fu'><a href='id_priors.html'>id_priors</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
+  custom_stancode <span class='op'>=</span> <span class='fu'><a href='id_stancode.html'>id_stancode</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
   dry <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
@@ -161,14 +161,14 @@ Defaults to the the <code>id_priors</code> defined for the model class being fit
     </tr>
     <tr>
       <th>custom_stancode</th>
-      <td><p>A list of <code>stanvars</code> used to define custom stancode in
-<code>brms</code>. By default uses the code designed for the model class being fit (as
-specified using <code>id_stancode</code>).</p></td>
+      <td><p>A list of <code>stanvars</code> used to define custom stancode
+in <code>brms</code>. By default uses the code designed for the model class being fit
+(as specified using <code>id_stancode</code>).</p></td>
     </tr>
     <tr>
       <th>dry</th>
-      <td><p>Logical, defaults to TRUE. For testing purposes should just the <code>stan</code>
-code be output with not fitting done.</p></td>
+      <td><p>Logical, defaults to TRUE. For testing purposes should just the
+<code>stan</code> code be output with not fitting done.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -297,17 +297,17 @@ code be output with not fitting done.</p></td>
 #&gt; 50: France   500 2020-11-19     45
 #&gt;     region cases       date deaths</div><div class='input'>
 <span class='va'>dt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='prepare.html'>prepare</a></span><span class='op'>(</span>
-  <span class='va'>dt</span>, model <span class='op'>=</span> <span class='st'>"convolution"</span>, location <span class='op'>=</span> <span class='st'>"region"</span>, 
+  <span class='va'>dt</span>, model <span class='op'>=</span> <span class='st'>"convolution"</span>, location <span class='op'>=</span> <span class='st'>"region"</span>,
   primary <span class='op'>=</span> <span class='st'>"cases"</span>, secondary <span class='op'>=</span> <span class='st'>"deaths"</span>,
   <span class='op'>)</span>
 
 <span class='co'># fit the convolution model using a Poisson observation model</span>
 <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='idbrm.html'>idbrm</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>dt</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>poisson</a></span><span class='op'>(</span>link <span class='op'>=</span> <span class='st'>"identity"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: The global prior 'normal(0, 1)' of class 'b' will not be used in the model as all related coefficients have individual priors already. If you did not set those priors yourself, then maybe brms has assigned default priors. See ?set_prior and ?get_prior for more details.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: The global prior 'normal(0, 0.1)' of class 'b' will not be used in the model as all related coefficients have individual priors already. If you did not set those priors yourself, then maybe brms has assigned default priors. See ?set_prior and ?get_prior for more details.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: The global prior 'normal(0, 0.1)' of class 'b' will not be used in the model as all related coefficients have individual priors already. If you did not set those priors yourself, then maybe brms has assigned default priors. See ?set_prior and ?get_prior for more details.</span></div><div class='output co'>#&gt; <span class='message'>Compiling Stan program...</span></div><div class='output co'>#&gt; <span class='message'>recompiling to avoid crashing R session</span></div><div class='output co'>#&gt; <span class='message'>Start sampling</span></div><div class='output co'>#&gt; 
-#&gt; SAMPLING FOR MODEL '88187c5aae95321a0a9a332a2550384d' NOW (CHAIN 1).
+#&gt; SAMPLING FOR MODEL 'e4ccf5dd2357d9acd6613671e1e633ca' NOW (CHAIN 1).
 #&gt; Chain 1: 
-#&gt; Chain 1: Gradient evaluation took 0.000868 seconds
-#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 8.68 seconds.
+#&gt; Chain 1: Gradient evaluation took 0.000925 seconds
+#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 9.25 seconds.
 #&gt; Chain 1: Adjust your expectations accordingly!
 #&gt; Chain 1: 
 #&gt; Chain 1: 
@@ -324,15 +324,15 @@ code be output with not fitting done.</p></td>
 #&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; Chain 1: 
-#&gt; Chain 1:  Elapsed Time: 4.59708 seconds (Warm-up)
-#&gt; Chain 1:                4.23643 seconds (Sampling)
-#&gt; Chain 1:                8.83351 seconds (Total)
+#&gt; Chain 1:  Elapsed Time: 4.63293 seconds (Warm-up)
+#&gt; Chain 1:                4.19086 seconds (Sampling)
+#&gt; Chain 1:                8.82379 seconds (Total)
 #&gt; Chain 1: 
 #&gt; 
-#&gt; SAMPLING FOR MODEL '88187c5aae95321a0a9a332a2550384d' NOW (CHAIN 2).
+#&gt; SAMPLING FOR MODEL 'e4ccf5dd2357d9acd6613671e1e633ca' NOW (CHAIN 2).
 #&gt; Chain 2: 
-#&gt; Chain 2: Gradient evaluation took 0.000518 seconds
-#&gt; Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 5.18 seconds.
+#&gt; Chain 2: Gradient evaluation took 0.000516 seconds
+#&gt; Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 5.16 seconds.
 #&gt; Chain 2: Adjust your expectations accordingly!
 #&gt; Chain 2: 
 #&gt; Chain 2: 
@@ -349,15 +349,15 @@ code be output with not fitting done.</p></td>
 #&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; Chain 2: 
-#&gt; Chain 2:  Elapsed Time: 4.49195 seconds (Warm-up)
-#&gt; Chain 2:                3.5694 seconds (Sampling)
-#&gt; Chain 2:                8.06135 seconds (Total)
+#&gt; Chain 2:  Elapsed Time: 4.51057 seconds (Warm-up)
+#&gt; Chain 2:                3.7367 seconds (Sampling)
+#&gt; Chain 2:                8.24727 seconds (Total)
 #&gt; Chain 2: 
 #&gt; 
-#&gt; SAMPLING FOR MODEL '88187c5aae95321a0a9a332a2550384d' NOW (CHAIN 3).
+#&gt; SAMPLING FOR MODEL 'e4ccf5dd2357d9acd6613671e1e633ca' NOW (CHAIN 3).
 #&gt; Chain 3: 
-#&gt; Chain 3: Gradient evaluation took 0.000591 seconds
-#&gt; Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 5.91 seconds.
+#&gt; Chain 3: Gradient evaluation took 0.000641 seconds
+#&gt; Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 6.41 seconds.
 #&gt; Chain 3: Adjust your expectations accordingly!
 #&gt; Chain 3: 
 #&gt; Chain 3: 
@@ -374,15 +374,15 @@ code be output with not fitting done.</p></td>
 #&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; Chain 3: 
-#&gt; Chain 3:  Elapsed Time: 4.74261 seconds (Warm-up)
-#&gt; Chain 3:                3.95904 seconds (Sampling)
-#&gt; Chain 3:                8.70165 seconds (Total)
+#&gt; Chain 3:  Elapsed Time: 4.84004 seconds (Warm-up)
+#&gt; Chain 3:                4.00085 seconds (Sampling)
+#&gt; Chain 3:                8.84088 seconds (Total)
 #&gt; Chain 3: 
 #&gt; 
-#&gt; SAMPLING FOR MODEL '88187c5aae95321a0a9a332a2550384d' NOW (CHAIN 4).
+#&gt; SAMPLING FOR MODEL 'e4ccf5dd2357d9acd6613671e1e633ca' NOW (CHAIN 4).
 #&gt; Chain 4: 
-#&gt; Chain 4: Gradient evaluation took 0.000581 seconds
-#&gt; Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 5.81 seconds.
+#&gt; Chain 4: Gradient evaluation took 0.0006 seconds
+#&gt; Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 6 seconds.
 #&gt; Chain 4: Adjust your expectations accordingly!
 #&gt; Chain 4: 
 #&gt; Chain 4: 
@@ -399,9 +399,9 @@ code be output with not fitting done.</p></td>
 #&gt; Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; Chain 4: 
-#&gt; Chain 4:  Elapsed Time: 4.83592 seconds (Warm-up)
-#&gt; Chain 4:                4.11864 seconds (Sampling)
-#&gt; Chain 4:                8.95455 seconds (Total)
+#&gt; Chain 4:  Elapsed Time: 5.01642 seconds (Warm-up)
+#&gt; Chain 4:                4.52553 seconds (Sampling)
+#&gt; Chain 4:                9.54194 seconds (Total)
 #&gt; Chain 4: </div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
