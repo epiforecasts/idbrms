@@ -14,8 +14,8 @@ prepare(data, ...)
 
 \item{...}{Additional arguments passed to model specific prepare functions}
 
-\item{model}{Character string, model type to prepare to use. Supported options
-are "convolution".}
+\item{model}{Character string, model type to prepare to use.
+Supported options are "convolution".}
 }
 \description{
 Prepare data for modelling with idbrm
@@ -33,7 +33,7 @@ dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
 dt[is.na(deaths), deaths := 0]
 
 dt <- prepare(
-  dt, model = "convolution", location = "region", 
+  dt, model = "convolution", location = "region",
   primary = "cases", secondary = "deaths",
   )
 dt[]

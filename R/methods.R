@@ -1,5 +1,5 @@
 #' Prepare data for modelling with idbrm
-#' 
+#'
 #' @param data A dataframe to be used for modelling
 #' @rdname prepare
 #' @export
@@ -10,8 +10,8 @@ prepare <- function(data, ...) {
 
 #' Default method used when preparing data
 #'
-#' @param model Character string, model type to prepare to use. Supported options
-#' are "convolution".
+#' @param model Character string, model type to prepare to use.
+#'  Supported options are "convolution".
 #' @param ... Additional arguments passed to model specific prepare functions
 #' @rdname prepare
 #' @method prepare default
@@ -56,19 +56,19 @@ id_formula <- function(data, ...) {
 }
 
 #' Interface for infectious disease modelling using brms.
-#' 
+#'
 #' @param formula A formula as defined using `id_formula` or as supported by
 #' `brms::brm`.
-#' @param data A data frame as prepared for modelling using `prepare` with a 
+#' @param data A data frame as prepared for modelling using `prepare` with a
 #' class associated with the model prepared for.
-#' @param dry Logical, defaults to TRUE. For testing purposes should just the `stan`
-#' code be output with not fitting done.
+#' @param dry Logical, defaults to TRUE. For testing purposes should just the
+#' `stan` code be output with not fitting done.
 #' @param family A observation model family as defined in `brms`.
-#' @param priors A list of priors as defined using `brms` or `id_priors`. 
+#' @param priors A list of priors as defined using `brms` or `id_priors`.
 #' Defaults to the the `id_priors` defined for the model class being fit.
-#' @param custom_stancode A list of `stanvars` used to define custom stancode in 
-#' `brms`. By default uses the code designed for the model class being fit (as
-#' specified using `id_stancode`).
+#' @param custom_stancode A list of `stanvars` used to define custom stancode
+#'  in `brms`. By default uses the code designed for the model class being fit
+#'  (as specified using `id_stancode`).
 #' @rdname brmid
 #' @inheritParams idbrmfit
 #' @export
@@ -79,4 +79,3 @@ idbrm <- function(data, formula, family, priors, custom_stancode, dry = FALSE,
                   ...) {
   UseMethod("idbrm")
 }
-

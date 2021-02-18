@@ -6,10 +6,10 @@
 \usage{
 \method{idbrm}{idbrms_convolution}(
   data,
-  formula = idbrms::id_formula(data),
+  formula = id_formula(data),
   family = negbinomial(link = "identity"),
-  priors = idbrms::id_priors(data),
-  custom_stancode = idbrms::id_stancode(data),
+  priors = id_priors(data),
+  custom_stancode = id_stancode(data),
   dry = FALSE,
   ...
 )
@@ -28,12 +28,12 @@ and secondary (the observation of interest. Should have class
 \item{priors}{A list of priors as defined using \code{brms} or \code{id_priors}.
 Defaults to the the \code{id_priors} defined for the model class being fit.}
 
-\item{custom_stancode}{A list of \code{stanvars} used to define custom stancode in
-\code{brms}. By default uses the code designed for the model class being fit (as
-specified using \code{id_stancode}).}
+\item{custom_stancode}{A list of \code{stanvars} used to define custom stancode
+in \code{brms}. By default uses the code designed for the model class being fit
+(as specified using \code{id_stancode}).}
 
-\item{dry}{Logical, defaults to TRUE. For testing purposes should just the \code{stan}
-code be output with not fitting done.}
+\item{dry}{Logical, defaults to TRUE. For testing purposes should just the
+\code{stan} code be output with not fitting done.}
 
 \item{...}{Additional parameters passed to \code{brms::brm}.}
 }
@@ -60,7 +60,7 @@ dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
 dt[is.na(deaths), deaths := 0]
 
 dt <- prepare(
-  dt, model = "convolution", location = "region", 
+  dt, model = "convolution", location = "region",
   primary = "cases", secondary = "deaths",
   )
 

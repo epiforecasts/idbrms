@@ -1,7 +1,7 @@
 #' Prepare data for fitting using a convolution model
 #'
-#' @param data A data frame containing at least two integer observations and a date 
-#' variable.
+#' @param data A data frame containing at least two integer observations and a
+#'  date variable.
 #' @param location Character string, variable to use as the spatial location.
 #' @param primary Character string, variable to use as the primary observation.
 #' @param secondary Character string, variable to use as the secondary
@@ -25,18 +25,18 @@
 #'    )
 #' dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
 #' dt[is.na(deaths), deaths := 0]
-#' 
+#'
 #' dt <- prepare(
-#'   dt, model = "convolution", location = "region", 
+#'   dt, model = "convolution", location = "region",
 #'   primary = "cases", secondary = "deaths",
 #'   )
 #' dt[]
-prepare.idbrms_convolution <- function(data, location, primary, secondary, 
+prepare.idbrms_convolution <- function(data, location, primary, secondary,
                                        initial_obs = 14, max_convolution = 30,
                                        ...) {
   # deal with global warnings
   time <- index <- init_obs <- cstart <- cmax <- NULL
-  
+
   # convert to data.table
   data <- as.data.table(data)
 
@@ -57,7 +57,7 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
       setnames(data, primary, "primary")
     }
   }
-  
+
   # set up secondary observation
   if (!exists("secondary", data)) {
     if (missing(secondary)) {
@@ -66,7 +66,7 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
       setnames(data, secondary, "secondary")
     }
   }
-  
+
   # order, index, and time
   setorder(data, location, date)
   data[, time := as.numeric(date) - min(as.numeric(date))]
@@ -79,16 +79,16 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
   # assign start of convolution for each data point
   data[, cstart := index - max_convolution]
   data[cstart < 1, cstart := 1]
-  
+
   # assign max convolution variable
   data[, cmax := as.integer(index - cstart + 1)]
-  
+
   # enforce integers
   dcols <- colnames(data)
   sdcols <- c("index", "cstart", "cmax", "init_obs", "primary", "secondary")
-  data <- data[,lapply(.SD, as.integer), .SDcols = sdcols, 
+  data <- data[, lapply(.SD, as.integer), .SDcols = sdcols,
                 by = setdiff(dcols, sdcols)]
-  
+
   # assign column order
   setorder(data, location, date)
   setcolorder(data, c("location", "date", "time", "index", "init_obs",
@@ -97,8 +97,8 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 }
 
 #' Define priors for the delay convolution model
-#' 
-#' @param data A data.frame as produced by `prepare` that must contain the date, 
+#'
+#' @param data A data.frame as produced by `prepare` that must contain the date,
 #' location (as loc), primary (the data that the outcome is a convolution of)
 #' and secondary (the observation of interest. Should have class
 #'  "idbrms_convolution".
@@ -113,16 +113,16 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 #' @inheritParams id_priors
 #' @author Sam Abbott
 #' @export
-id_priors.idbrms_convolution <- function(data, 
-                                         scale = c(round(log(0.1), 2), 0.05), 
+id_priors.idbrms_convolution <- function(data,
+                                         scale = c(round(log(0.1), 2), 0.05),
                                          cmean = c(2.5, 1),
                                          lcsd = c(-0.5, 0.25), ...) {
   normal <- NULL
-  priors <- set_prior(paste0("normal(", scale[1], ",", scale[2], ")"), 
+  priors <- set_prior(paste0("normal(", scale[1], ",", scale[2], ")"),
                       nlpar = "scale", coef = "Intercept") +
-    set_prior(paste0("normal(", cmean[1], ",", cmean[2], ")"), 
+    set_prior(paste0("normal(", cmean[1], ",", cmean[2], ")"),
               nlpar = "cmean", coef = "Intercept") +
-    set_prior(paste0("normal(", lcsd[1], ",", lcsd[2], ")"), 
+    set_prior(paste0("normal(", lcsd[1], ",", lcsd[2], ")"),
               nlpar = "lcsd", coef = "Intercept") +
     prior(normal(0, 0.1), nlpar = "scale") +
     prior(normal(0, 1), nlpar = "cmean") +
@@ -131,7 +131,7 @@ id_priors.idbrms_convolution <- function(data,
 }
 
 #' Define stan code for a delay convolution model
-#' 
+#'
 #' @inheritParams id_priors.idbrms_convolution
 #' @method id_stancode idbrms_convolution
 #' @author Sam Abbott
@@ -149,12 +149,12 @@ id_stancode.idbrms_convolution <- function(data, ...) {
     vector[n] adj_y = to_vector(y) + small;
     vector[n] upper_y = (log(adj_y + 1) - c_mu) / c_sigma;
     vector[n] lower_y = (log(adj_y) - c_mu) / c_sigma;
-    real max_cdf = normal_cdf((log(max_val + small) - c_mu) / c_sigma, 0.0, 1.0);
+    real max_cdf = normal_cdf((log(max_val + small) - c_mu) / c_sigma, 0.0, );
     real min_cdf = normal_cdf((log(small) - c_mu) / c_sigma, 0.0, 1.0);
     real trunc_cdf = max_cdf - min_cdf;
     for (i in 1:n) {
-      pmf[i] = (normal_cdf(upper_y[i], 0.0, 1.0) - normal_cdf(lower_y[i], 0.0, 1.0)) /
-      trunc_cdf;
+      pmf[i] = (normal_cdf(upper_y[i], 0.0, 1.0) -
+                normal_cdf(lower_y[i], 0.0, 1.0)) / trunc_cdf;
     }
     return(pmf);
   }"),
@@ -166,12 +166,13 @@ id_stancode.idbrms_convolution <- function(data, ...) {
     for (i in 1:conv_max) {
       conv_indexes[i] = conv_max - i;
     }
-    pmf = pmf + discretised_lognormal_pmf(conv_indexes, conv_mean, conv_sd, conv_max);
+    pmf = pmf + discretised_lognormal_pmf(conv_indexes, conv_mean, conv_sd,
+                                          conv_max);
     return(pmf);
     }"),
-    stanvar(block = "functions", 
+    stanvar(block = "functions",
             scode = "
-   vector idbrms_convolve(int[] primary, vector scale, vector cmean, 
+   vector idbrms_convolve(int[] primary, vector scale, vector cmean,
                           vector  lcsd, int[] cmax, int[] index, int[] cstart,
                           int[] init) {
     int n = num_elements(scale);
@@ -179,12 +180,11 @@ id_stancode.idbrms_convolution <- function(data, ...) {
     vector[n] ils = inv_logit(scale);
     vector[n] csd = exp(lcsd);
     vector[n] cs;
-    
     for (i in 1:n) {
-      vector[cmax[i]] pmf = calc_pmf(cmean[i], csd[i], cmax[i]);       
+      vector[cmax[i]] pmf = calc_pmf(cmean[i], csd[i], cmax[i]);
       real cp = 1e-5;
       cp += dot_product(p[cstart[i]:index[i]], tail(pmf, cmax[i]));
-      cs[i] = cp * ils[i]; 
+      cs[i] = cp * ils[i];
     }
     return(cs);
   }"))
@@ -208,9 +208,9 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
   form <- bf(
     secondary ~ idbrms_convolve(primary, scale, cmean, lcsd, cmax, index,
                                 cstart, init_obs),
-    as.formula(paste0("scale ", paste(scale, collapse = " "))), 
+    as.formula(paste0("scale ", paste(scale, collapse = " "))),
     as.formula(paste0("cmean", paste(cmean, collapse = " "))),
-    as.formula(paste0("lcsd",paste(lcsd, collapse = " "))),
+    as.formula(paste0("lcsd", paste(lcsd, collapse = " "))),
     nl = TRUE, loop = FALSE
   )
   class(form) <- c(class(form), "idbrms_convolution")
@@ -219,11 +219,11 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 
 #' Delay Convolution Model
 #'
-#' @description A model that assumes that a secondary observations can be 
-#' predicted using a convolution of a primary observation multipled by some 
-#' scaling factor. An example use case of this model is to estimate the 
+#' @description A model that assumes that a secondary observations can be
+#' predicted using a convolution of a primary observation multipled by some
+#' scaling factor. An example use case of this model is to estimate the
 #' case fatality rate (with the primary observation being cases and the
-#' secondary observation being deaths) and then explore factors that influence 
+#' secondary observation being deaths) and then explore factors that influence
 #' it.
 #' @inheritParams id_priors.idbrms_convolution
 #' @inheritParams idbrm
@@ -232,7 +232,7 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #' @method idbrm idbrms_convolution
 #' @export
 #' @author Sam Abbott
-#' @examples 
+#' @examples
 #' \donttest{
 #' # define some example data
 #' library(data.table)
@@ -242,23 +242,23 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #'    )
 #' dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
 #' dt[is.na(deaths), deaths := 0]
-#' 
+#'
 #' dt <- prepare(
-#'   dt, model = "convolution", location = "region", 
+#'   dt, model = "convolution", location = "region",
 #'   primary = "cases", secondary = "deaths",
 #'   )
 #'
 #' # fit the convolution model using a Poisson observation model
 #' fit <- idbrm(data = dt, family = poisson(link = "identity"))
 #' }
-idbrm.idbrms_convolution <- function(data, formula = idbrms::id_formula(data),
-                                     family = negbinomial(link = "identity"), 
-                                     priors = idbrms::id_priors(data), 
-                                     custom_stancode = idbrms::id_stancode(data), 
+idbrm.idbrms_convolution <- function(data, formula = id_formula(data),
+                                     family = negbinomial(link = "identity"),
+                                     priors = id_priors(data),
+                                     custom_stancode = id_stancode(data),
                                      dry = FALSE, ...) {
-fit <- idbrmfit(formula = formula, 
-                family = family, 
-                priors = priors, 
+fit <- idbrmfit(formula = formula,
+                family = family,
+                priors = priors,
                 custom_stancode = custom_stancode,
                 data = data, dry = dry, ...)
 return(fit)

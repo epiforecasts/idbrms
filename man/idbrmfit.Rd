@@ -15,10 +15,11 @@ idbrmfit(formula, data, family, priors, custom_stancode, dry = FALSE, ...)
 
 \item{priors}{A list of priors as defined using \code{brms}.}
 
-\item{custom_stancode}{A list of \code{stanvars} used to define custom stancode in
-\code{brms}.}
+\item{custom_stancode}{A list of \code{stanvars} used to define custom stancode
+in \code{brms}.}
 
-\item{dry}{Logical, defaults to TRUE. For testing purposes should just the \code{stan}
+\item{dry}{Logical, defaults to TRUE. For testing purposes should just the
+\code{stan}
 code be output with not fitting done.}
 
 \item{...}{Additional arguments to pass to \code{brms::brm}.}

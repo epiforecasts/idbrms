@@ -15,8 +15,8 @@
 )
 }
 \arguments{
-\item{data}{A data frame containing at least two integer observations and a date
-variable.}
+\item{data}{A data frame containing at least two integer observations and a
+date variable.}
 
 \item{location}{Character string, variable to use as the spatial location.}
 
@@ -49,7 +49,7 @@ dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
 dt[is.na(deaths), deaths := 0]
 
 dt <- prepare(
-  dt, model = "convolution", location = "region", 
+  dt, model = "convolution", location = "region",
   primary = "cases", secondary = "deaths",
   )
 dt[]
