@@ -50,7 +50,8 @@ idbrms_stan_chunk <- function(path) {
 #' the stan code.
 idbrms_version_stanvar <- function() {
   stanvar(
-    scode = "// code chunks used from ", utils::packageVersion("idbrms"), "\n",
+    scode = paste0("// code chunks used from idbrms ", 
+                   utils::packageVersion("idbrms"), "\n"),
     block = "functions"
   )
 }
