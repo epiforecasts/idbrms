@@ -46,11 +46,11 @@ idbrms_stan_chunk <- function(path) {
 
 #' Label a idbrms stan model with a version indicator
 #'
-#' @return A brms stanvar chunk containing the package version used to build 
+#' @return A brms stanvar chunk containing the package version used to build
 #' the stan code.
 idbrms_version_stanvar <- function() {
   stanvar(
-    scode = paste0("// code chunks used from idbrms ", 
+    scode = paste0("// code chunks used from idbrms ",
                    utils::packageVersion("idbrms"), "\n"),
     block = "functions"
   )
