@@ -149,7 +149,7 @@ id_stancode.idbrms_convolution <- function(data, ...) {
     vector[n] adj_y = to_vector(y) + small;
     vector[n] upper_y = (log(adj_y + 1) - c_mu) / c_sigma;
     vector[n] lower_y = (log(adj_y) - c_mu) / c_sigma;
-    real max_cdf = normal_cdf((log(max_val + small) - c_mu) / c_sigma, 0.0, );
+    real max_cdf = normal_cdf((log(max_val + small) - c_mu) / c_sigma, 0.0, 1.0);
     real min_cdf = normal_cdf((log(small) - c_mu) / c_sigma, 0.0, 1.0);
     real trunc_cdf = max_cdf - min_cdf;
     for (i in 1:n) {
