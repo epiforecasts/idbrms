@@ -124,9 +124,9 @@ id_priors.idbrms_convolution <- function(data,
               nlpar = "cmean", coef = "Intercept") +
     set_prior(paste0("normal(", lcsd[1], ",", lcsd[2], ")"),
               nlpar = "lcsd", coef = "Intercept") +
-    prior(normal(0, 0.1), nlpar = "scale") +
+    prior(normal(0, 0.5), nlpar = "scale") +
     prior(normal(0, 1), nlpar = "cmean") +
-    prior(normal(0, 0.1), nlpar = "lcsd")
+    prior(normal(0, 0.5), nlpar = "lcsd")
   return(priors)
 }
 
