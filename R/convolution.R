@@ -149,6 +149,10 @@ id_stancode.idbrms_convolution <- function(data, ...) {
       ),
     stanvar(
       block = "functions",
+      scode = idbrms_stan_chunk("functions/calc_unique_pmfs.stan")
+    ),
+    stanvar(
+      block = "functions",
       scode = idbrms_stan_chunk("functions/idbrms_convolve.stan")
       )
   )

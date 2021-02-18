@@ -15,8 +15,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
     brms,
-    data.table
+    rstan,
+    data.table,
+    purrr
 Suggests: 
+    testthat,
     covr,
     spelling
 Language: en-US

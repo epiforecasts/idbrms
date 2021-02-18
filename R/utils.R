@@ -55,3 +55,31 @@ idbrms_version_stanvar <- function() {
     block = "functions"
   )
 }
+
+#' Expose package stan functions in R
+#'
+#' @description 
+#' This function exposes internal stan functions in R from a user
+#' supplied list of target files. Allows for testing of stan functions in R and potentially
+#' user use in R code.
+#' @param files A character vector indicating the target files
+#' @param dir A character string indicating the directory for the file
+#' @param ... Additional arguments passed to `rstan::expose_stan_functions`.
+#' @return NULL
+#' @export
+#' @importFrom rstan expose_stan_functions stanc
+#' @importFrom purrr map_chr
+expose_idbrms_stan_fns <- function(files, dir, ...) {
+  functions <- paste0(
+    "\n functions{ \n",
+    paste(map_chr(
+      files,
+      ~ paste(readLines(file.path(dir, .)), collapse = "\n")
+    ),
+    collapse = "\n"
+    ),
+    "\n }"
+  )
+  expose_stan_functions(stanc(model_code = functions), ...)
+  return(invisible(NULL))
+}

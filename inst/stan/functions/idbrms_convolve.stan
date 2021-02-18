@@ -6,10 +6,14 @@ vector idbrms_convolve(int[] primary, vector scale, vector cmean,
     vector[n] ils = inv_logit(scale);
     vector[n] csd = exp(lcsd);
     vector[n] cs;
+    int mcmax = max(cmax);
+    vector[mcmax] pmf[n];
+    
+    pmf = calc_unique_pmfs(cmean, csd, mcmax);
+    
     for (i in 1:n) {
-      vector[cmax[i]] pmf = calc_pmf(cmean[i], csd[i], cmax[i]);
       real cp = 1e-5;
-      cp += dot_product(p[cstart[i]:index[i]], tail(pmf, cmax[i]));
+      cp += dot_product(p[cstart[i]:index[i]], tail(pmf[i], cmax[i]));
       cs[i] = cp * ils[i];
     }
     return(cs);
