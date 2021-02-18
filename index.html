@@ -137,37 +137,60 @@
 <li>Fit the model assuming a Poisson observation model (<em>It is important to use an identity link here as <code>idbrm</code> provides its own link by default</em>).</li>
 </ul>
 <!-- end list --><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/idbrm.html">idbrm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dt</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/idbrm.html">idbrm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dt</span><span class="op">)</span></code></pre></div>
+<ul>
+<li>Summarise fit.</li>
+</ul>
+<!-- end list --><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
+<span class="co">#&gt;  Family: poisson </span>
+<span class="co">#&gt;   Links: mu = identity </span>
+<span class="co">#&gt; Formula: secondary ~ idbrms_convolve(primary, scale, cmean, lcsd, cmax, index, cstart, init_obs) </span>
+<span class="co">#&gt;          scale ~ 1</span>
+<span class="co">#&gt;          cmean ~ 1</span>
+<span class="co">#&gt;          lcsd ~ 1</span>
+<span class="co">#&gt;    Data: data (Number of observations: 36) </span>
+<span class="co">#&gt; Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;</span>
+<span class="co">#&gt;          total post-warmup samples = 4000</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Population-Level Effects: </span>
+<span class="co">#&gt;                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS</span>
+<span class="co">#&gt; scale_Intercept    -0.86      0.02    -0.89    -0.83 1.00     3820     2870</span>
+<span class="co">#&gt; cmean_Intercept     1.54      0.03     1.47     1.61 1.00     3874     2773</span>
+<span class="co">#&gt; lcsd_Intercept     -0.28      0.06    -0.40    -0.15 1.00     3777     2822</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS</span>
+<span class="co">#&gt; and Tail_ESS are effective sample size measures, and Rhat is the potential</span>
+<span class="co">#&gt; scale reduction factor on split chains (at convergence, Rhat = 1).</span></code></pre></div>
 <ul>
 <li>Explore estimated effect sizes (we approximately should recover those used for simulation).</li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<!-- end list --><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/brms/man/posterior_summary.html" class="external-link">posterior_summary</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"scale_Intercept"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                    Estimate Est.Error      Q2.5     Q97.5</span>
-<span class="co">#&gt; b_scale_Intercept 0.4235455  1.017231 0.4093871 0.4376386</span>
+<span class="co">#&gt;                    Estimate Est.Error     Q2.5     Q97.5</span>
+<span class="co">#&gt; b_scale_Intercept 0.4236644  1.017188 0.409688 0.4379042</span>
 <span class="fu"><a href="https://rdrr.io/pkg/brms/man/posterior_summary.html" class="external-link">posterior_summary</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"cmean_Intercept"</span><span class="op">)</span>
-<span class="co">#&gt;                   Estimate Est.Error     Q2.5    Q97.5</span>
-<span class="co">#&gt; b_cmean_Intercept 1.542616 0.0343038 1.477288 1.609575</span>
+<span class="co">#&gt;                   Estimate  Est.Error     Q2.5    Q97.5</span>
+<span class="co">#&gt; b_cmean_Intercept 1.541415 0.03406508 1.474534 1.607168</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/brms/man/posterior_summary.html" class="external-link">posterior_summary</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"lcsd_Intercept"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                   Estimate Est.Error      Q2.5     Q97.5</span>
-<span class="co">#&gt; b_lcsd_Intercept 0.7569181  1.064411 0.6686294 0.8568435</span></code></pre></div>
+<span class="co">#&gt;                   Estimate Est.Error     Q2.5     Q97.5</span>
+<span class="co">#&gt; b_lcsd_Intercept 0.7562595   1.06484 0.670132 0.8572652</span></code></pre></div>
 <ul>
 <li>Expose model stan functions.</li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<!-- end list --><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/brms/man/expose_functions.brmsfit.html" class="external-link">expose_functions</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>Posterior predictive check. Runs without error but looks unlikely to be correct.</li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<!-- end list --><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/brms/man/pp_check.brmsfit.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
 <span class="co">#&gt; Using 10 posterior samples for ppc type 'dens_overlay' by default.</span></code></pre></div>
 <p><img src="reference/figures/README-pred-check-1.png" width="100%"></p>
 <ul>
 <li>Plot conditional effects (fails with due to mismatched vector sizes in the stan dot product + there are no variables in this model so should always fail).</li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<!-- end list --><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/brms/man/conditional_effects.brmsfit.html" class="external-link">conditional_effects</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
