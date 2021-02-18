@@ -213,7 +213,7 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #'   )
 #'
 #' # fit the convolution model using a Poisson observation model
-#' fit <- idbrm(data = dt, family = poisson(link = "identity"), dry = TRUE)
+#' fit <- idbrm(data = dt, family = poisson(identity = "link"))
 #' }
 idbrm.idbrms_convolution <- function(data, formula = id_formula(data),
                                      family = negbinomial(link = "identity"),

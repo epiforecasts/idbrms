@@ -113,8 +113,34 @@ head(prep_obs, 10)
 <!-- end list -->
 
 ``` r
-fit <- idbrm(data = dt, family = poisson(link = "identity"))
+fit <- idbrm(data = dt)
+```
+
+  - Summarise fit.
+
+<!-- end list -->
+
+``` r
 summary(fit)
+#>  Family: poisson 
+#>   Links: mu = identity 
+#> Formula: secondary ~ idbrms_convolve(primary, scale, cmean, lcsd, cmax, index, cstart, init_obs) 
+#>          scale ~ 1
+#>          cmean ~ 1
+#>          lcsd ~ 1
+#>    Data: data (Number of observations: 36) 
+#> Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+#>          total post-warmup samples = 4000
+#> 
+#> Population-Level Effects: 
+#>                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> scale_Intercept    -0.86      0.02    -0.89    -0.83 1.00     3820     2870
+#> cmean_Intercept     1.54      0.03     1.47     1.61 1.00     3874     2773
+#> lcsd_Intercept     -0.28      0.06    -0.40    -0.15 1.00     3777     2822
+#> 
+#> Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+#> and Tail_ESS are effective sample size measures, and Rhat is the potential
+#> scale reduction factor on split chains (at convergence, Rhat = 1).
 ```
 
   - Explore estimated effect sizes (we approximately should recover
@@ -124,14 +150,14 @@ summary(fit)
 
 ``` r
 exp(posterior_summary(fit, "scale_Intercept"))
-#>                    Estimate Est.Error      Q2.5     Q97.5
-#> b_scale_Intercept 0.4235455  1.017231 0.4093871 0.4376386
+#>                    Estimate Est.Error     Q2.5     Q97.5
+#> b_scale_Intercept 0.4236644  1.017188 0.409688 0.4379042
 posterior_summary(fit, "cmean_Intercept")
-#>                   Estimate Est.Error     Q2.5    Q97.5
-#> b_cmean_Intercept 1.542616 0.0343038 1.477288 1.609575
+#>                   Estimate  Est.Error     Q2.5    Q97.5
+#> b_cmean_Intercept 1.541415 0.03406508 1.474534 1.607168
 exp(posterior_summary(fit, "lcsd_Intercept"))
-#>                   Estimate Est.Error      Q2.5     Q97.5
-#> b_lcsd_Intercept 0.7569181  1.064411 0.6686294 0.8568435
+#>                   Estimate Est.Error     Q2.5     Q97.5
+#> b_lcsd_Intercept 0.7562595   1.06484 0.670132 0.8572652
 ```
 
   - Expose model stan functions.
