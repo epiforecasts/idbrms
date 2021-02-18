@@ -138,56 +138,20 @@ id_priors.idbrms_convolution <- function(data,
 #' @export
 id_stancode.idbrms_convolution <- function(data, ...) {
   stanvars <- c(
-    stanvar(block = "functions",
-            scode = "
-  vector discretised_lognormal_pmf(int[] y, real mu, real sigma, int max_val) {
-    int n = num_elements(y);
-    vector[n] pmf;
-    real small = 1e-5;
-    real c_sigma = sigma < small ? small : sigma;
-    real c_mu = mu < small ? small : mu;
-    vector[n] adj_y = to_vector(y) + small;
-    vector[n] upper_y = (log(adj_y + 1) - c_mu) / c_sigma;
-    vector[n] lower_y = (log(adj_y) - c_mu) / c_sigma;
-    real max_cdf = normal_cdf((log(max_val + small) - c_mu) / c_sigma, 0.0, 1.0);
-    real min_cdf = normal_cdf((log(small) - c_mu) / c_sigma, 0.0, 1.0);
-    real trunc_cdf = max_cdf - min_cdf;
-    for (i in 1:n) {
-      pmf[i] = (normal_cdf(upper_y[i], 0.0, 1.0) -
-                normal_cdf(lower_y[i], 0.0, 1.0)) / trunc_cdf;
-    }
-    return(pmf);
-  }"),
-    stanvar(block = "functions",
-            scode = "
-  vector calc_pmf(real conv_mean, real conv_sd, int conv_max) {
-    vector[conv_max] pmf = rep_vector(1e-5, conv_max);
-    int conv_indexes[conv_max];
-    for (i in 1:conv_max) {
-      conv_indexes[i] = conv_max - i;
-    }
-    pmf = pmf + discretised_lognormal_pmf(conv_indexes, conv_mean, conv_sd,
-                                          conv_max);
-    return(pmf);
-    }"),
-    stanvar(block = "functions",
-            scode = "
-   vector idbrms_convolve(int[] primary, vector scale, vector cmean,
-                          vector  lcsd, int[] cmax, int[] index, int[] cstart,
-                          int[] init) {
-    int n = num_elements(scale);
-    vector[n] p = to_vector(primary);
-    vector[n] ils = inv_logit(scale);
-    vector[n] csd = exp(lcsd);
-    vector[n] cs;
-    for (i in 1:n) {
-      vector[cmax[i]] pmf = calc_pmf(cmean[i], csd[i], cmax[i]);
-      real cp = 1e-5;
-      cp += dot_product(p[cstart[i]:index[i]], tail(pmf, cmax[i]));
-      cs[i] = cp * ils[i];
-    }
-    return(cs);
-  }"))
+    idbrms_version_stanvar(),
+    stanvar(
+      block = "functions",
+      scode = idbrms_stan_chunk("functions/discretised_lognormal_pmf.stan")
+      ),
+    stanvar(
+      block = "functions",
+      scode = idbrms_stan_chunk("functions/calc_pmf.stan")
+      ),
+    stanvar(
+      block = "functions",
+      scode = idbrms_stan_chunk("functions/idbrms_convolve.stan")
+      )
+  )
 }
 
 #' Define a formula for the convolution model
@@ -249,7 +213,7 @@ id_formula.idbrms_convolution <- function(data, scale = ~ 1, cmean = ~ 1,
 #'   )
 #'
 #' # fit the convolution model using a Poisson observation model
-#' fit <- idbrm(data = dt, family = poisson(link = "identity"))
+#' fit <- idbrm(data = dt, family = poisson(link = "identity"), dry = TRUE)
 #' }
 idbrm.idbrms_convolution <- function(data, formula = id_formula(data),
                                      family = negbinomial(link = "identity"),

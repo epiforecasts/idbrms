@@ -25,3 +25,32 @@ idbrmfit <- function(formula, data, family, priors, custom_stancode,
   class(fit) <- c(class(fit), "idbrmsfit")
   return(fit)
 }
+
+
+#' Read in a idbrms Stan code chunk
+#'
+#' @param path The path within the "stan" folder of the installed idbrms
+#' package to the stan code chunk of interest.
+#' @return A character string containing the stan code chunk of interest.
+#' @export
+#'
+#' @examples
+#' idbrms_stan_chunk("functions/idbrms_convolve.stan")
+idbrms_stan_chunk <- function(path) {
+  paste(
+    readLines(
+      system.file(paste0("stan/", path), package = "idbrms")),
+    collapse = "\n"
+    )
+}
+
+#' Label a idbrms stan model with a version indicator
+#'
+#' @return A brms stanvar chunk containing the package version used to build 
+#' the stan code.
+idbrms_version_stanvar <- function() {
+  stanvar(
+    scode = "// code chunks used from ", utils::packageVersion("idbrms"), "\n",
+    block = "functions"
+  )
+}
