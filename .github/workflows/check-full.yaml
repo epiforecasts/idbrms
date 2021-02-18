@@ -270,4 +270,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: epiforecasts/idbrms/idbrms:latest
+          tags: docker.pkg.github.com/epiforecasts/idbrms/idbrms:latest
