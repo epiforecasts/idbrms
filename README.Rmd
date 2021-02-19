@@ -58,9 +58,9 @@ weight_cmf <- function(x, ...) {
 
 obs <- data.table(
   region = "Glastonbury", 
-  cases = as.integer(c(10 * exp(0.2 * 1:25), 
-                       10 * exp(0.2 * 25) * exp(-0.1 * 1:25))),
-  date = seq(as.Date("2020-10-01"), by = "days", length.out = 50))
+  cases = as.integer(c(10 * exp(0.2 * 1:50), 
+                       10 * exp(0.2 * 50) * exp(-0.1 * 1:50))),
+  date = seq(as.Date("2020-10-01"), by = "days", length.out = 100))
 # roll over observed cases to produce a convolution
 obs <- obs[, deaths := frollapply(cases, 15, weight_cmf, align = "right")]
 obs <- obs[!is.na(deaths)]
@@ -93,7 +93,7 @@ fit <- idbrm(data = prep_obs, family = poisson(link = "identity"))
 ```
 
 ```{r fit-model, eval = FALSE}
-fit <- idbrm(data = dt)
+fit <- idbrm(data = prep_obs)
 ```
 
 * Summarise fit.
