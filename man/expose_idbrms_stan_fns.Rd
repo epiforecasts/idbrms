@@ -15,6 +15,6 @@ expose_idbrms_stan_fns(files, dir, ...)
 }
 \description{
 This function exposes internal stan functions in R from a user
-supplied list of target files. Allows for testing of stan functions in R and potentially
-user use in R code.
+supplied list of target files. Allows for testing of stan functions in R and
+potentially user use in R code.
 }

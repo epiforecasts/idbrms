@@ -1,8 +1,8 @@
 context("id_stancode.idbrms_convolution")
 
 if (!testthat:::on_cran()) {
-  files <- c("discretised_lognormal_pmf.stan", 
-             "calc_pmf.stan", 
+  files <- c("discretised_lognormal_pmf.stan",
+             "calc_pmf.stan",
              "calc_unique_pmfs.stan")
   suppressMessages(
     expose_idbrms_stan_fns(
@@ -23,15 +23,15 @@ test_that("calc_unique_pmfs: Successfully calculates a singe PMF", {
   )
 })
 
-test_that("calc_unique_pmfs: Successfully calculates multiple PMFs with unique 
+test_that("calc_unique_pmfs: Successfully calculates multiple PMFs with unique
          summary statistics", {
   pmfs <- calc_unique_pmfs(c(1.5, 1.2, 1.9, 0.2), c(0.2, 0.1, 0.4, 0.6), 10)
   expect_equal(length(unique(pmfs)), 4)
 })
 
-test_that("calc_unique_pmfs: Successfully calculates multiple PMFs with duplicate 
-         summary statistics", {
-           pmfs <- calc_unique_pmfs(c(1.5, 1.2, 1.5, 1.2), 
+test_that("calc_unique_pmfs: Successfully calculates multiple PMFs with
+           duplicate summary statistics", {
+           pmfs <- calc_unique_pmfs(c(1.5, 1.2, 1.5, 1.2),
                                    c(0.2, 0.1, 0.2, 0.1), 10)
            expect_equal(length(unique(pmfs)), 2)
          })

@@ -58,10 +58,10 @@ idbrms_version_stanvar <- function() {
 
 #' Expose package stan functions in R
 #'
-#' @description 
+#' @description
 #' This function exposes internal stan functions in R from a user
-#' supplied list of target files. Allows for testing of stan functions in R and potentially
-#' user use in R code.
+#' supplied list of target files. Allows for testing of stan functions in R and
+#'  potentially user use in R code.
 #' @param files A character vector indicating the target files
 #' @param dir A character string indicating the directory for the file
 #' @param ... Additional arguments passed to `rstan::expose_stan_functions`.

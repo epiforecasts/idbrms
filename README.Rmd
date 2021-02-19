@@ -82,7 +82,7 @@ ggplot(obs) +
 
 ```{r prep-data}
 prep_obs <- prepare(obs, model = "convolution", location = "region",
-                    primary = "cases", secondary = "deaths")
+                    primary = "cases", secondary = "deaths", max_convolution = 15)
 head(prep_obs, 10)
 ```
 
