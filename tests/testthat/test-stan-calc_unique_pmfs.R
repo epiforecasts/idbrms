@@ -18,7 +18,7 @@ test_that("calc_unique_pmfs: Successfully calculates a singe PMF", {
     c(0.00, 0.00, 0.01, 0.06, 0.22, 0.42, 0.26, 0.02, 0.00, 0.00)
   )
   expect_equal(
-    round(calc_unique_pmf(1.5, 0.2, 6)[[1]], 2),
+    round(calc_unique_pmfs(1.5, 0.2, 6)[[1]], 2),
     c(0.24, 0.46, 0.28, 0.02, 0.00, 0.00)
   )
 })
