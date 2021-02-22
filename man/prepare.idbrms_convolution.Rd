@@ -45,8 +45,8 @@ dt <- data.table(
    region = "France", cases = seq(10, 500, by = 10),
    date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
    )
-dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
-dt[is.na(deaths), deaths := 0]
+dt <- dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+dt <- dt[is.na(deaths), deaths := 0]
 
 dt <- prepare(
   dt, model = "convolution", location = "region",

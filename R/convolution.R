@@ -23,8 +23,8 @@
 #'    region = "France", cases = seq(10, 500, by = 10),
 #'    date = seq(as.Date("2020-10-01"), by = "days", length.out = 50)
 #'    )
-#' dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
-#' dt[is.na(deaths), deaths := 0]
+#' dt <- dt[, deaths := as.integer(shift(cases, 5) * 0.1)]
+#' dt <- dt[is.na(deaths), deaths := 0]
 #'
 #' dt <- prepare(
 #'   dt, model = "convolution", location = "region",
@@ -114,8 +114,8 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 #' @author Sam Abbott
 #' @export
 id_priors.idbrms_convolution <- function(data,
-                                         scale = c(round(log(0.1), 2), 0.05),
-                                         cmean = c(2.5, 1),
+                                         scale = c(round(log(0.1), 2), 1),
+                                         cmean = c(2, 1),
                                          lcsd = c(-0.5, 0.25), ...) {
   normal <- NULL
   priors <- set_prior(paste0("normal(", scale[1], ",", scale[2], ")"),
@@ -147,6 +147,10 @@ id_stancode.idbrms_convolution <- function(data, ...) {
       block = "functions",
       scode = idbrms_stan_chunk("functions/calc_pmf.stan")
       ),
+    stanvar(
+      block = "functions",
+      scode = idbrms_stan_chunk("functions/calc_unique_pmfs.stan")
+    ),
     stanvar(
       block = "functions",
       scode = idbrms_stan_chunk("functions/idbrms_convolve.stan")

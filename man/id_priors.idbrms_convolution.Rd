@@ -6,8 +6,8 @@
 \usage{
 \method{id_priors}{idbrms_convolution}(
   data,
-  scale = c(round(log(0.1), 2), 0.05),
-  cmean = c(2.5, 1),
+  scale = c(round(log(0.1), 2), 1),
+  cmean = c(2, 1),
   lcsd = c(-0.5, 0.25),
   ...
 )

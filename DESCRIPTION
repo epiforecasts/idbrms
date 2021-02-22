@@ -1,12 +1,15 @@
 Package: idbrms
 Title: Infectious Disease Modelling Using brms
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R: c(
     person(given = "Sam",
            family = "Abbott",
            role = c("aut", "cre"),
            email = "sam.abbott@lshtm.ac.uk",
-           comment = c(ORCID = "0000-0001-8057-8037"))
+           comment = c(ORCID = "0000-0001-8057-8037")),
+    person("Sebastian", "Funk", 
+         email = "sebastian.funk@lshtm.ac.uk", 
+         role = c("aut")))
 Description: Infectious disease modelling using brms.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -15,8 +18,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
     brms,
-    data.table
+    rstan,
+    data.table,
+    purrr
 Suggests: 
+    testthat,
     covr,
     spelling
 Language: en-US
