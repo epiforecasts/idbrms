@@ -115,7 +115,7 @@ prepare.idbrms_convolution <- function(data, location, primary, secondary,
 #' @export
 id_priors.idbrms_convolution <- function(data,
                                          scale = c(round(log(0.1), 2), 1),
-                                         cmean = c(2.5, 1),
+                                         cmean = c(2, 1),
                                          lcsd = c(-0.5, 0.25), ...) {
   normal <- NULL
   priors <- set_prior(paste0("normal(", scale[1], ",", scale[2], ")"),

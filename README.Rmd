@@ -46,25 +46,25 @@ library(ggplot2)
 ```{r toy-data}
 # apply a convolution of a log normal to a vector of observations
 weight_cmf <- function(x, ...) {
-   set.seed(x[1])
-   meanlog <- rnorm(1, 1.6, 0.2)
-   sdlog <- rnorm(1, 0.8, 0.1)
-   cmf <- cumsum(dlnorm(1:length(x), meanlog, sdlog)) -
-     cumsum(dlnorm(0:(length(x) - 1), meanlog, sdlog))
+  set.seed(x[1])
+   meanlog <- rnorm(1, 1.6, 0.1)
+   sdlog <- rnorm(1, 0.6, 0.025)
+   cmf <- (cumsum(dlnorm(1:length(x), meanlog, sdlog)) -
+     cumsum(dlnorm(0:(length(x) - 1), meanlog, sdlog)))
    conv <- sum(x * rev(cmf), na.rm = TRUE)
-   conv <- round(conv, 0)
+   conv <- rpois(1, round(conv, 0))
   return(conv)
 }
 
 obs <- data.table(
   region = "Glastonbury", 
-  cases = as.integer(c(10 * exp(0.2 * 1:50), 
-                       10 * exp(0.2 * 50) * exp(-0.1 * 1:50))),
+  cases = as.integer(c(10 * exp(0.15 * 1:50), 
+                       10 * exp(0.15 * 50) * exp(-0.1 * 1:50))),
   date = seq(as.Date("2020-10-01"), by = "days", length.out = 100))
 # roll over observed cases to produce a convolution
 obs <- obs[, deaths := frollapply(cases, 15, weight_cmf, align = "right")]
 obs <- obs[!is.na(deaths)]
-obs <- obs[, deaths := round(deaths * rnorm(.N, 0.4, 0.025), 0)]
+obs <- obs[, deaths := round(deaths * rnorm(.N, 0.25, 0.025), 0)]
 obs <- obs[deaths < 0, deaths := 0]
 ```
 
@@ -93,7 +93,7 @@ fit <- idbrm(data = prep_obs, family = poisson(link = "identity"))
 ```
 
 ```{r fit-model, eval = FALSE}
-fit <- idbrm(data = prep_obs)
+fit <- idbrm(data = prep_obs, family = poisson(link = "identity"))
 ```
 
 * Summarise fit.
@@ -105,7 +105,8 @@ summary(fit)
 * Explore estimated effect sizes (we approximately should recover those used for simulation).
 
 ```{r}
-exp(posterior_summary(fit, "scale_Intercept"))
+exp(posterior_summary(fit, "scale_Intercept")) / 
+  (1 + exp(posterior_summary(fit, "scale_Intercept")))
 posterior_summary(fit, "cmean_Intercept")
 exp(posterior_summary(fit, "lcsd_Intercept"))
 ```
@@ -120,7 +121,23 @@ expose_functions(fit)
 expose_functions(fit)
 ```
 
-* Posterior predictive check. Runs without error but looks unlikely to be correct.
+* Test central estimates returns something sensible compared to observed data.
+
+```{r}
+n_obs <- length(prep_obs$primary)
+pt_ests <-  summary(fit)$fixed[, 1]
+p_primary <- with(prep_obs, idbrms_convolve(primary, rep(pt_ests["scale_Intercept"], n_obs), 
+                                            rep(pt_ests["cmean_Intercept"], n_obs),
+                                            rep(pt_ests["lcsd_Intercept"], n_obs), 
+                                            cmax, index, cstart, init_obs))
+ggplot(prep_obs) + 
+  aes(x = date, y = secondary) +
+  geom_col(fill = "lightgrey") +
+  geom_point(aes(y = p_primary)) +
+  theme_minimal()
+```
+
+* Posterior predictive check. Runs without error but looks unlikely to be correct given check above.
 
 ```{r pred-check}
 pp_check(fit)
