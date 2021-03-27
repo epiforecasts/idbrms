@@ -128,9 +128,9 @@ it.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for idbrms_convolution</span>
-<span class='fu'><a href='idbrm.html'>idbrm</a></span><span class='op'>(</span>
+<span class='fu'><a href='brmid.html'>idbrm</a></span><span class='op'>(</span>
   <span class='va'>data</span>,
-  formula <span class='op'>=</span> <span class='fu'><a href='id_formula.idbrms_convolution.html'>id_formula</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
+  formula <span class='op'>=</span> <span class='fu'><a href='id_formula.html'>id_formula</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
   family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/brms/man/brmsfamily.html'>negbinomial</a></span><span class='op'>(</span>link <span class='op'>=</span> <span class='st'>"identity"</span><span class='op'>)</span>,
   priors <span class='op'>=</span> <span class='fu'><a href='id_priors.html'>id_priors</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
   custom_stancode <span class='op'>=</span> <span class='fu'><a href='id_stancode.html'>id_stancode</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>,
@@ -305,7 +305,7 @@ in <code>brms</code>. By default uses the code designed for the model class bein
   <span class='op'>)</span>
 
 <span class='co'># fit the convolution model using a Poisson observation model</span>
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='idbrm.html'>idbrm</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>dt</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>poisson</a></span><span class='op'>(</span>identity <span class='op'>=</span> <span class='st'>"link"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='brmid.html'>idbrm</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>dt</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>poisson</a></span><span class='op'>(</span>identity <span class='op'>=</span> <span class='st'>"link"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in poisson(identity = "link"): unused argument (identity = "link")</span></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
