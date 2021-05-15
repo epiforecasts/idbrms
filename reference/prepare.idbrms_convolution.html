@@ -58,8 +58,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -117,7 +115,7 @@
     <p>Prepare data for fitting using a convolution model</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for idbrms_convolution</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for idbrms_convolution</span>
 <span class='fu'><a href='prepare.html'>prepare</a></span><span class='op'>(</span>
   <span class='va'>data</span>,
   <span class='va'>location</span>,
@@ -126,7 +124,7 @@
   initial_obs <span class='op'>=</span> <span class='fl'>14</span>,
   max_convolution <span class='op'>=</span> <span class='fl'>30</span>,
   <span class='va'>...</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -172,7 +170,7 @@ convolution. Defaults to 30 days.</p></td>
     <p>Sam Abbott</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'># define some example data</span></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># define some example data</span></span>
 <span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://r-datatable.com'>data.table</a></span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>dt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span></span>
 <span class='r-in'>   region <span class='op'>=</span> <span class='st'>"France"</span>, cases <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>500</span>, by <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>,</span>
@@ -238,7 +236,7 @@ convolution. Defaults to 30 days.</p></td>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 49:   France 2020-11-18   48    49        0     19   31     490        44</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 50:   France 2020-11-19   49    50        0     20   31     500        45</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>     location       date time index init_obs cstart cmax primary secondary</span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
