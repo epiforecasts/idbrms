@@ -65,7 +65,7 @@ dt <- prepare(
   )
 
 # fit the convolution model using a Poisson observation model
-fit <- idbrm(data = dt, family = poisson(identity = "link"))
+fit <- idbrm(data = dt, family = poisson(link = "identity"))
 }
 }
 \author{
