@@ -1,15 +1,15 @@
 context("id_stancode.idbrms_convolution")
 
-if (!testthat:::on_cran()) {
-  files <- c("discretised_lognormal_pmf.stan",
-             "calc_pmf.stan",
-             "calc_unique_pmfs.stan")
-  suppressMessages(
-    expose_idbrms_stan_fns(
-      files, dir =  system.file("stan/functions", package = "idbrms")
-      )
-    )
-}
+skip_on_cran()
+
+files <- c("discretised_lognormal_pmf.stan",
+           "calc_pmf.stan",
+           "calc_unique_pmfs.stan")
+suppressMessages(
+  expose_idbrms_stan_fns(
+    files, dir =  system.file("stan/functions", package = "idbrms")
+  )
+)
 
 
 test_that("calc_unique_pmfs: Successfully calculates a singe PMF", {
