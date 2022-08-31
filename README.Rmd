@@ -139,7 +139,7 @@ ggplot(prep_obs) +
   theme_minimal()
 ```
 
-* Posterior predictive check. Runs without error but looks unlikely to be correct given check above.
+* Posterior predictive check.
 
 ```{r pred-check}
 pp_check(fit)
