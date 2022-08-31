@@ -125,7 +125,9 @@ expose_functions(fit)
 
 ```{r}
 n_obs <- length(prep_obs$primary)
-pt_ests <-  summary(fit)$fixed[, 1]
+fixed <- summary(fit)$fixed
+pt_ests <- fixed[, 1]
+names(pt_ests) <- rownames(fixed)
 p_primary <- with(prep_obs, idbrms_convolve(primary, rep(pt_ests["scale_Intercept"], n_obs), 
                                             rep(pt_ests["cmean_Intercept"], n_obs),
                                             rep(pt_ests["lcsd_Intercept"], n_obs), 
