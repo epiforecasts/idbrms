@@ -35,7 +35,7 @@ id_priors <- function(data, ...) {
   UseMethod("id_priors")
 }
 
-#' Define model specific stancode
+#' Define model specific Stan code
 #' @export
 #' @inheritParams id_priors
 #' @rdname id_stancode
